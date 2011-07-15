@@ -38,30 +38,30 @@ The function description block is free form text from the first ## to the first 
 ##Example
 
 <pre>
-## 
-# Builds and sends a MaxDB dbm_version command packet and returns the results.
-#
-# @param socket The socket that the packet will be sent on
-#
-# @return An array of hashes for each of the info from the dbm_version command
-##
-function maxdb_version(socket)
-{
-  local_var version_pkt, data, version;
+  ## 
+  # Builds and sends a MaxDB dbm_version command packet and returns the results.
+  #
+  # @param socket The socket that the packet will be sent on
+  #
+  # @return An array of hashes for each of the info from the dbm_version command
+  ##
+  function maxdb_version(socket)
+  {
+    local_var version_pkt, data, version;
     
-  version_pkt = 
-    maxdb_command_pkt() +
-    "dbm_version";
+    version_pkt = 
+      maxdb_command_pkt() +
+      "dbm_version";
     
-  version_pkt = insstr(version_pkt, mkdword(strlen(version_pkt)), 0, 3);
-  version_pkt = insstr(version_pkt, mkdword(strlen(version_pkt)), 20, 23);
+    version_pkt = insstr(version_pkt, mkdword(strlen(version_pkt)), 0, 3);
+    version_pkt = insstr(version_pkt, mkdword(strlen(version_pkt)), 20, 23);
   
-  send(socket:socket, data:version_pkt);
-  data = maxdb_read_pkt(socket:socket);
-  version = maxdb_parse_version_info(data:data);
+    send(socket:socket, data:version_pkt);
+    data = maxdb_read_pkt(socket:socket);
+    version = maxdb_parse_version_info(data:data);
   
-  return version;
-}
+    return version;
+  }
 </pre>
 
 #Templates
@@ -71,26 +71,24 @@ Nasldoc uses the ERB templating engine to make generating the output html dead s
 ##Example
 
 <pre>
-
-<html>
-	<head>
-		<title>nasldoc</title>
-		<link rel = 'stylesheet' type= 'text/css' href='stylesheet.css'>
-	</head>
-	<body>
-		<img src='nessus.jpg' />
-		<br><br><br>
-		<ul>
-			<% @file_list.each_with_index do |file, i| %>
-				<% row_class = i % 2 == 0 ? "even" : "odd" %> 
-				<% output_file = file.gsub(".", "_") %>
-				<% output_file = File.basename(file).gsub(".", "_") %>
-				<li class="<%= row_class %>"><a href='<%= output_file %>.html' target='content'><%= File.basename(file) %></a></li>
-			<% end %>
-		</ul>
-		<br><br><br>
-		<ul><a href='overview.html' target='content'>Home</a></ul>
-	</body>
-</html>
-
+  <html>
+  	<head>
+  		<title>nasldoc</title>
+  		<link rel = 'stylesheet' type= 'text/css' href='stylesheet.css'>
+  	</head>
+  	<body>
+  		<img src='nessus.jpg' />
+  		<br><br><br>
+  		<ul>
+  			<% @file_list.each_with_index do |file, i| %>
+  				<% row_class = i % 2 == 0 ? "even" : "odd" %> 
+  				<% output_file = file.gsub(".", "_") %>
+  				<% output_file = File.basename(file).gsub(".", "_") %>
+  				<li class="<%= row_class %>"><a href='<%= output_file %>.html' target='content'><%= File.basename(file) %></a></li>
+  			<% end %>
+  		</ul>
+  		<br><br><br>
+  		<ul><a href='overview.html' target='content'>Home</a></ul>
+  	</body>
+  </html>
 </pre>
