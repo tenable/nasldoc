@@ -37,7 +37,6 @@ The function description block is free form text from the first ## to the first 
 
 ##Example
 
-<pre>
   ## 
   # Builds and sends a MaxDB dbm_version command packet and returns the results.
   #
@@ -62,7 +61,6 @@ The function description block is free form text from the first ## to the first 
   
     return version;
   }
-</pre>
 
 #Templates
 
@@ -70,7 +68,6 @@ Nasldoc uses the ERB templating engine to make generating the output html dead s
 
 ##Example
 
-<pre>
   <html>
   	<head>
   		<title>nasldoc</title>
@@ -91,4 +88,3 @@ Nasldoc uses the ERB templating engine to make generating the output html dead s
   		<ul><a href='overview.html' target='content'>Home</a></ul>
   	</body>
   </html>
-</pre>
