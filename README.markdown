@@ -1,0 +1,96 @@
+#Setup
+
+Setting up nasldoc to run is fairly simple. All you really need is the Ruby interpreter.
+
+	* [http://www.rubylang.org Ruby Programming Language]
+
+#Development
+
+Before writing nasldoc from scratch I tried to use several different open source solutions.
+
+- jsdoc - This tool was promising but the author hardcoded /** */ as the comment delimiter which causes issues with Nasl since we cannot add a new comment style.
+- javadoc - Parsed out the java language which made it impossible to do Nasl with it
+- phpDocumentor - Worked well on parsing .inc files, but required /** */ comment styles
+- Doxygen - Everything about Doxygen is hardcoded into the source, I wasn't able to change anything to get it to work with Nasl.
+
+#Usage
+
+Using nasldoc is fairly simple just pass it a directory or a single file that you want to generate the documentation for. Nasldoc is configured to only parse .inc files which special comment markup.
+
+	% nasldoc /opt/nessus/lib/nessus/plugins/
+
+This will cause a directory called nasldoc/ to be created in your current directory. This directory will contain all of the generated html documents, just open index.html inside of nasldoc/ and view the documentation.
+
+#Comment Markup
+
+Nasldoc comments are inclosed in ## blocks and use special tags to mark items, currently there are only 3 tags. Tags can be added in a matter of minutes to the parser.
+
+Nasldoc supports several markup tags this tags are:
+
+	* @param - used to label named arguments to a function
+	* @anonparam - used to label anonymous arguments to a function
+	* @return - what the function returns
+
+##Function Description Block
+
+The function description block is free form text from the first ## to the first @tag in the nasldoc body, the lines are split on the # and rejoined with spaces.
+
+##Example
+
+<pre>
+## 
+# Builds and sends a MaxDB dbm_version command packet and returns the results.
+#
+# @param socket The socket that the packet will be sent on
+#
+# @return An array of hashes for each of the info from the dbm_version command
+##
+function maxdb_version(socket)
+{
+  local_var version_pkt, data, version;
+    
+  version_pkt = 
+    maxdb_command_pkt() +
+    "dbm_version";
+    
+  version_pkt = insstr(version_pkt, mkdword(strlen(version_pkt)), 0, 3);
+  version_pkt = insstr(version_pkt, mkdword(strlen(version_pkt)), 20, 23);
+  
+  send(socket:socket, data:version_pkt);
+  data = maxdb_read_pkt(socket:socket);
+  version = maxdb_parse_version_info(data:data);
+  
+  return version;
+}
+</pre>
+
+#Templates
+
+Nasldoc uses the ERB templating engine to make generating the output html dead simple. Attached is an example of the sidebar, ruby code can be injected to help generate the layout.
+
+##Example
+
+<pre>
+
+<html>
+	<head>
+		<title>nasldoc</title>
+		<link rel = 'stylesheet' type= 'text/css' href='stylesheet.css'>
+	</head>
+	<body>
+		<img src='nessus.jpg' />
+		<br><br><br>
+		<ul>
+			<% @file_list.each_with_index do |file, i| %>
+				<% row_class = i % 2 == 0 ? "even" : "odd" %> 
+				<% output_file = file.gsub(".", "_") %>
+				<% output_file = File.basename(file).gsub(".", "_") %>
+				<li class="<%= row_class %>"><a href='<%= output_file %>.html' target='content'><%= File.basename(file) %></a></li>
+			<% end %>
+		</ul>
+		<br><br><br>
+		<ul><a href='overview.html' target='content'>Home</a></ul>
+	</body>
+</html>
+
+</pre>

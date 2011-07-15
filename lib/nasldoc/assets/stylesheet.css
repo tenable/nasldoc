@@ -1,0 +1,93 @@
+/* JSDoc style sheet */
+
+/* Define colors, fonts and other style attributes here to override the defaults */
+
+/* Page background color */
+body {
+	background-color: #FFFFFF;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	list-style-position: outside;
+	background-repeat: repeat-y;
+	background-position: center;
+}
+
+#content {
+  padding: 5px;
+}
+
+table.nopad {
+  border:1px solid black;
+  width:100%;
+  border-collapse: collapse;
+}
+
+.odd {
+  background-color: #EEEEEE;
+}
+
+.even {
+  background-color: white;
+}
+
+tr {
+  border:1px solid black;
+  padding:0px;
+}
+
+td {
+  border:1px solid black;
+  padding:0px;
+}
+
+.header {
+  background: #EEEEEE;
+  width: 100%;
+}
+.TableHeadingColor     { background: #EEEEEE } 
+
+td,p, li, ul {
+	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	line-height: 16px;
+	font-weight: normal;
+	color: #333333;
+	text-decoration: none;
+}
+
+a {
+	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #397AB2;
+	text-decoration: underline;
+}
+a:link {
+	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #397AB2;
+	text-decoration: underline;
+}
+a:hover {
+	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #4E6F9A;
+}
+
+h1 {
+	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 26px;
+	font-style: normal;
+	line-height: normal;
+	font-weight: bold;
+	color: #397AB2;
+	clip: rect(auto,auto,auto,auto);
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+}
+
+

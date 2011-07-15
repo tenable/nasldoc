@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '/../lib'))
+
+$stdout.sync = true
+$stderr.sync = true
+
+require 'rubygems'
+require 'nasldoc'
+
+app = NaslDoc::CLI::Application.new
+app.main
