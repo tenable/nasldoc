@@ -9,7 +9,7 @@ task :build do
 end
  
 task :release => :build do
-  system "gem push nessusdb-#{NaslDoc::VERSION}.gem"
+  system "gem push  #{NaslDoc::APP_NAME}-#{NaslDoc::VERSION}.gem"
 end
 
 task :clean do
