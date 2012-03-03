@@ -55,7 +55,7 @@ module NaslDoc
 					@current_file = File.basename(file, ".inc")
 					contents = File.open(file, 'rb') { |f| f.read } unless file == nil
 					
-					##
+					## @todo wtf exit?
 					add_nasldoc_stubs contents
 					exit
 					##
