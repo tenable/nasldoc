@@ -1,5 +1,8 @@
 # News
 
+#0.0.9 (March 2012)
+- 
+
 #0.0.8 (July 2011)
 - Open sourced project on github
 - Added daily_badurl.inc to the blacklist
