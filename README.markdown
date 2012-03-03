@@ -1,17 +1,9 @@
-#Setup
+#Installation
 
-Setting up nasldoc to run is fairly simple. All you really need is the Ruby interpreter.
+Installation is really easy, all you need to do is gem install!
 
-	* [http://www.rubylang.org Ruby Programming Language]
+	% gem install nasldoc
 
-#Development
-
-Before writing nasldoc from scratch I tried to use several different open source solutions.
-
-- jsdoc - This tool was promising but the author hardcoded /** */ as the comment delimiter which causes issues with Nasl since we cannot add a new comment style.
-- javadoc - Parsed out the java language which made it impossible to do Nasl with it
-- phpDocumentor - Worked well on parsing .inc files, but required /** */ comment styles
-- Doxygen - Everything about Doxygen is hardcoded into the source, I wasn't able to change anything to get it to work with Nasl.
 
 #Usage
 
@@ -27,40 +19,32 @@ Nasldoc comments are inclosed in ## blocks and use special tags to mark items, c
 
 Nasldoc supports several markup tags this tags are:
 
-	* @param - used to label named arguments to a function
-	* @anonparam - used to label anonymous arguments to a function
-	* @return - what the function returns
+- @param - used to label named arguments to a function
+- @anonparam - used to label anonymous arguments to a function
+- @return - what the function returns
+- @deprecated
+- @nessus
+- @category
+- @remark
 
-##Function Description Block
+#Function Description Block
 
 The function description block is free form text from the first ## to the first @tag in the nasldoc body, the lines are split on the # and rejoined with spaces.
 
-##Example
+#Example
 
 <pre>
 ## 
-# Builds and sends a MaxDB dbm_version command packet and returns the results.
+# An example addition function in NASL
 #
-# @param socket The socket that the packet will be sent on
+# @param arg1 first number to add
+# @param arg2 second number to add
 #
-# @return An array of hashes for each of the info from the dbm_version command
+# @return The sum of arg1 and arg2
 ##
-function maxdb_version(socket)
+function add(arg1, arg2)
 {
-  local_var version_pkt, data, version;
-  
-  version_pkt = 
-    maxdb_command_pkt() +
-    "dbm_version";
-  
-  version_pkt = insstr(version_pkt, mkdword(strlen(version_pkt)), 0, 3);
-  version_pkt = insstr(version_pkt, mkdword(strlen(version_pkt)), 20, 23);
-
-  send(socket:socket, data:version_pkt);
-  data = maxdb_read_pkt(socket:socket);
-  version = maxdb_parse_version_info(data:data);
-
-  return version;
+  return (arg1 + arg2);
 }
 </pre>
 
@@ -70,8 +54,8 @@ Nasldoc uses the ERB templating engine to make generating the output html dead s
 
 ##Example
 
-<pre>
-<html>
+
+`<html>
 	<head>
 		<title>nasldoc</title>
 		<link rel = 'stylesheet' type= 'text/css' href='stylesheet.css'>
@@ -90,5 +74,5 @@ Nasldoc uses the ERB templating engine to make generating the output html dead s
 		<br><br><br>
 		<ul><a href='overview.html' target='content'>Home</a></ul>
 	</body>
-</html>
-</pre>
+</html>`
+
