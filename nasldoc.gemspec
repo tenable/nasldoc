@@ -7,7 +7,7 @@ require 'nasldoc'
 Gem::Specification.new do |s|
 	s.name												= "#{NaslDoc::APP_NAME}"
 	s.version											= NaslDoc::VERSION
-	s.homepage										= "https://researchwiki.corp.tenablesecurity.com/index.php/Nasl_doc"
+	s.homepage										= "http://hammackj.com/projects/nasldoc"
 	s.summary											= "#{NaslDoc::APP_NAME}"
 	s.description									= "#{NaslDoc::APP_NAME} is a NASL documentation generator"
 	s.license											= "BSD"
