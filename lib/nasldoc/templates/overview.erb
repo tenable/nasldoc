@@ -12,7 +12,7 @@
 					</td>
 				</tr>
 
-				<% @file_list.each do |file| %>
+				<% @file_list.sort.each do |file| %>
 					<% output_file = file.gsub(".", "_") %>
 					<% output_file = File.basename(file).gsub(".", "_") %>
 					<tr>

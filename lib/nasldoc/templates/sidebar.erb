@@ -7,7 +7,7 @@
 		<img src='nessus.jpg' />
 		<br><br><br>
 		<ul>
-			<% @file_list.each_with_index do |file, i| %>
+			<% @file_list.sort.each_with_index do |file, i| %>
 				<% row_class = i % 2 == 0 ? "even" : "odd" %> 
 				<% output_file = file.gsub(".", "_") %>
 				<% output_file = File.basename(file).gsub(".", "_") %>
