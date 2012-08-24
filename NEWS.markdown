@@ -1,7 +1,7 @@
 # News
 
 #0.0.9 (March 2012)
-- 
+- Fixed a show stopper
 
 #0.0.8 (July 2011)
 - Open sourced project on github
