@@ -88,7 +88,7 @@
 				<p><%= function["summary"]%></p>
 											
 				<% if function["params"].size != 0 %>
-					<h3>Parameters:</h3>
+					<h3>Named Parameters:</h3>
 					<ul>
 					<% function["params"].each do |k,v| %>
 						<li><code><%= k %></code> - <%= v %></li>
