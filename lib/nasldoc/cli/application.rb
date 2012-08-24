@@ -54,12 +54,6 @@ module NaslDoc
 					puts "[*] Processing File: #{file}"
 					@current_file = File.basename(file, ".inc")
 					contents = File.open(file, 'rb') { |f| f.read } unless file == nil
-					
-					## @todo wtf exit?
-					add_nasldoc_stubs contents
-					exit
-					##
-					
 
 					contents = process_file_overview contents
 					process_file_includes contents
@@ -132,11 +126,11 @@ module NaslDoc
 					nasldoc << "#\n"
 					nasldoc << "##\n"
 					nasldoc << "#{function} #{name}#{openpar}#{args}#{closepar}"
-					
+
 					new_file = new_file.gsub(line, nasldoc)
-					
+
 				end
-				
+
 				puts new_file
 			end
 
