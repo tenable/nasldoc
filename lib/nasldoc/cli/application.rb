@@ -259,8 +259,15 @@ module NaslDoc
 			#
 			def remove_blacklist file_list
 				blacklist = [
-					"blacklist_dss.inc", "blacklist_rsa.inc", "blacklist_ssl_rsa1024.inc",
-					"blacklist_ssl_rsa2048.inc", "daily_badip.inc", "known_CA.inc", "daily_badurl.inc"
+					"blacklist_dss.inc",
+					"blacklist_rsa.inc",
+					"blacklist_ssl_rsa1024.inc",
+					"blacklist_ssl_rsa2048.inc",
+					"custom_CA.inc",
+					"daily_badip.inc",
+					"daily_badurl.inc",
+					"known_CA.inc",
+					"sc_families.inc"
 				]
 
 				new_file_list = file_list.dup
