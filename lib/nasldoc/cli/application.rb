@@ -20,14 +20,13 @@ module NaslDoc
 				@template_dir = Pathname.new(__FILE__).realpath.to_s.gsub('cli/application.rb', 'templates')
 				@asset_dir = Pathname.new(__FILE__).realpath.to_s.gsub('cli/application.rb', 'assets')
 				@current_file = ""
-
 			end
 
 			# For ERB Support
 			#
 			def get_binding
-		    binding
-		  end
+				binding
+			end
 
 			#
 			#
