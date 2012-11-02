@@ -43,6 +43,19 @@ module NaslDoc
       ]
 
       def initialize(node)
+        # Create the freeform text members.
+        @summary = nil
+        @description = nil
+
+        # Create the tag members.
+        @anonparams = {}
+        @categories = []
+        @deprecated = nil
+        @nessus = nil
+        @params = {}
+        @remarks = []
+        @return = nil
+
         # Determine if this is a nasldoc comment.
         @valid = (node.text.body =~ /^\s*##\s*$/)
         return unless @valid
@@ -126,15 +139,6 @@ module NaslDoc
       def parse_tags(text)
         re_name = Regexp.new("[_a-zA-Z][_a-zA-Z0-9]*")
         re_tags = Regexp.new(tags_regex)
-
-        # Create the tag members.
-        @anonparams = {}
-        @categories = []
-        @deprecated = nil
-        @nessus = nil
-        @params = {}
-        @remarks = []
-        @return = nil
 
         # Tags start a line which continues until the next tag or blank line.
         text.each_line('') do |para|
