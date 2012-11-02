@@ -16,6 +16,17 @@
 %>
 
 <%
+  def safe(obj, default, *attrs)
+    attrs.each do |attr|
+      return default unless obj.respond_to? attr
+      obj = obj.send(attr)
+    end
+
+    obj
+  end
+%>
+
+<%
   def url(path)
     path.gsub('.', '_').sub(/_inc$/, '.html')
   end
@@ -59,7 +70,34 @@
       </ul>
       <% end %>
 
-      <% {Public: @public, Private: @private}.each do |name, list| %>
+      <% {Public: @globs_pub, Private: @globs_prv}.each do |name, list| %>
+      <% unless list.empty? %>
+      <h1><%= name %> Variable Summary</h1>
+      <% if name == :Public %>
+      <p>Public variables are intended to be accessed by the code that imports
+      this library.</p>
+      <% else %>
+      <p>Private variables are not intended to be accessed by the code that
+      imports this library. There is no functional difference between private
+      and public variables, only convention, and they may be accessed as
+      normal. </p>
+      <% end %>
+      <table class="nopad">
+        <tr class="TableHeadingColor">
+          <th>Name</th>
+          <th>Summary</th>
+        </tr>
+        <% list.each do |name| %>
+        <tr>
+	  <td><%= name %></td>
+	  <td><%= safe(comment(name, :global), "", :summary) %></td>
+        </tr>
+        <% end %>
+      </table>
+      <% end %>
+      <% end %>
+
+      <% {Public: @funcs_pub, Private: @funcs_prv}.each do |name, list| %>
       <% unless list.empty? %>
       <h1><%= name %> Function Summary</h1>
       <% if name == :Public %>
@@ -68,7 +106,8 @@
       <% else %>
       <p>Private functions are not intended to be called by the code that
       imports this library. There is no functional difference between private
-      and public functions, only convention, and may be called as normal. </p>
+      and public functions, only convention, and they may be called as
+      normal. </p>
       <% end %>
       <table class="nopad">
         <tr class="TableHeadingColor">
@@ -78,7 +117,7 @@
         <% list.keys.each do |name| %>
         <tr>
 	  <td><%= name %></td>
-	  <td><%= comment(name, :function).summary %></td>
+	  <td><%= safe(comment(name, :function), "", :summary) %></td>
         </tr>
         <% end %>
       </table>

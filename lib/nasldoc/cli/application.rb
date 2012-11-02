@@ -57,11 +57,14 @@ module NaslDoc
 					@functions[fn.name.name] = fn.params.map(&:name)
 				end
 
-				@private = @functions.select { |n, p| n =~ /^_/ }
-				@public = @functions.reject { |n, p| @private.key? n }
+				@funcs_prv = @functions.select { |n, p| n =~ /^_/ }
+				@funcs_pub = @functions.reject { |n, p| @funcs_prv.key? n }
 
 				# Collect the globals.
 				@globals = tree.all(:Global).map(&:idents).flatten.map(&:name)
+
+				@globs_prv = @globals.select { |n| n =~ /^_/ }
+				@globs_pub = @globals.reject { |n| @globs_prv.include? n }
 
 				# Collect the includes.
 				@includes = tree.all(:Include).map(&:filename).map(&:text)
