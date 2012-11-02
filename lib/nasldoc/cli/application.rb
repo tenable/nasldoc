@@ -62,7 +62,13 @@ module NaslDoc
 					begin
 						NaslDoc::CLI::Comment.new(comm)
 					rescue CommentException => e
+						# A short message is okay for format errors.
 						puts "[!!!] #{e.class.name} #{e.message}"
+						nil
+					rescue Exception => e
+						# A detailed message is given for programming errors.
+						puts "[!!!] #{e.class.name} #{e.message}"
+						puts e.backtrace.map{ |l| l.prepend "[!!!!] " }.join("\n")
 						nil
 					end
 				end
