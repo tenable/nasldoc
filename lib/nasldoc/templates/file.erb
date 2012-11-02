@@ -73,6 +73,7 @@
       <% {Public: @globs_pub, Private: @globs_prv}.each do |name, list| %>
       <% unless list.empty? %>
       <h1><%= name %> Variable Summary</h1>
+
       <% if name == :Public %>
       <p>Public variables are intended to be accessed by the code that imports
       this library.</p>
@@ -82,6 +83,7 @@
       and public variables, only convention, and they may be accessed as
       normal. </p>
       <% end %>
+
       <table class="nopad">
         <tr class="TableHeadingColor">
           <th>Name</th>
@@ -89,7 +91,7 @@
         </tr>
         <% list.each do |name| %>
         <tr>
-	  <td><%= name %></td>
+	  <td><a href="#<%= name %>"><%= name %></a></td>
 	  <td><%= safe(comment(name, :global), "", :summary) %></td>
         </tr>
         <% end %>
@@ -100,6 +102,7 @@
       <% {Public: @funcs_pub, Private: @funcs_prv}.each do |name, list| %>
       <% unless list.empty? %>
       <h1><%= name %> Function Summary</h1>
+
       <% if name == :Public %>
       <p>Public functions are intended to be called by the code that imports
       this library.</p>
@@ -109,18 +112,152 @@
       and public functions, only convention, and they may be called as
       normal. </p>
       <% end %>
+
       <table class="nopad">
         <tr class="TableHeadingColor">
           <th>Name</th>
           <th>Summary</th>
         </tr>
-        <% list.keys.each do |name| %>
+        <% list.keys.sort.each do |name| %>
         <tr>
-	  <td><%= name %></td>
+	  <td><a href="#<%= name %>"><%= name %></a></td>
 	  <td><%= safe(comment(name, :function), "", :summary) %></td>
         </tr>
         <% end %>
       </table>
+      <% end %>
+      <% end %>
+
+      <% {Public: @globs_pub, Private: @globs_prv}.each do |name, list| %>
+      <% unless list.empty? %>
+      <h1><%= name %> Variable Details</h1>
+      <% list.sort.each do |name| %>
+      <h2 id="<%= name %>"><%= name %></h2>
+      <% comm = comment(name, :global) %>
+
+      <% unless comm.nil? %>
+      <% unless comm.summary.nil? %>
+      <h3>Summary</h3>
+      <p class="summary"><%= comm.summary %></p>
+      <% end %>
+
+      <% unless comm.description.empty? %>
+      <h3>Description</h3>
+      <% comm.description.each do |para| %>
+      <p class="description"><%= para %></p>
+      <% end %>
+      <% end %>
+
+      <% unless comm.remarks.empty? %>
+      <h3>Remarks</h3>
+      <% comm.remarks.each do |rem| %>
+      <p class="remark"><%= rem %></p>
+      <% end %>
+      <% end %>
+
+      <% unless comm.deprecated.nil? %>
+      <h3>Deprecated</h3>
+      <p class="deprecated"><%= comm.deprecated %></p>
+      <% end %>
+
+      <% unless comm.nessus.nil? %>
+      <h3>Nessus Version</h3>
+      <p class="nessus"><%= comm.nessus %></p>
+      <% end %>
+
+      <% unless comm.categories.empty? %>
+      <h3>Categories</h3>
+      <ul>
+      <% comm.categories.each do |cat| %>
+      <li><%= cat %></li>
+      <% end %>
+      </ul>
+      <% end %>
+      <% end %>
+
+      <a href="#top">top</a>
+      <hr>
+      <% end %>
+      <% end %>
+      <% end %>
+
+      <% {Public: @funcs_pub, Private: @funcs_prv}.each do |name, list| %>
+      <% unless list.empty? %>
+      <h1><%= name %> Function Details</h1>
+      <% list.keys.sort.each do |name| %>
+      <h2 id="<%= name %>"><%= name %></h2>
+      <% comm = comment(name, :function) %>
+
+      <% unless comm.nil? %>
+      <% unless comm.summary.nil? %>
+      <h3>Summary</h3>
+      <p class="summary"><%= comm.summary %></p>
+      <% end %>
+
+      <% unless comm.description.empty? %>
+      <h3>Description</h3>
+      <% comm.description.each do |para| %>
+      <p class="description"><%= para %></p>
+      <% end %>
+      <% end %>
+
+      <% unless comm.remarks.empty? %>
+      <h3>Remarks</h3>
+      <% comm.remarks.each do |rem| %>
+      <p class="remark"><%= rem %></p>
+      <% end %>
+      <% end %>
+
+      <% unless comm.deprecated.nil? %>
+      <h3>Deprecated</h3>
+      <p class="deprecated"><%= comm.deprecated %></p>
+      <% end %>
+
+      <% unless comm.nessus.nil? %>
+      <h3>Nessus Version</h3>
+      <p class="nessus"><%= comm.nessus %></p>
+      <% end %>
+
+      <% unless comm.categories.empty? %>
+      <h3>Categories</h3>
+      <ul>
+      <% comm.categories.each do |cat| %>
+      <li><%= cat %></li>
+      <% end %>
+      </ul>
+      <% end %>
+
+      <% unless comm.anonparams.empty? %>
+      <h3>Anonymous Parameters</h3>
+      <dl>
+      <% comm.anonparams.each do |name, block| %>
+        <dt><%= name %></dt>
+        <dd><%= block %></dd>
+      <% end %>
+      </dl>
+      <% end %>
+      <% end %>
+
+      <% unless @functions[name].nil? || @functions[name].empty? %>
+      <h3>Named Parameters</h3>
+      <dl>
+      <% @functions[name].each do |name| %>
+        <dt><%= name %></dt>
+        <% unless comm.nil? || !comm.params[name].has_key?(name) %>
+        <dd><%= comm.params[name] %></dd>
+        <% end %>
+      <% end %>
+      </dl>
+      <% end %>
+
+      <% unless comm.nil? || comm.return.nil? %>
+      <h3>Return Value</h3>
+      <p class="return"><%= comm.return %></p>
+      <% end %>
+
+      <a href="#top">top</a>
+      <hr>
+      <% end %>
       <% end %>
       <% end %>
     </div>

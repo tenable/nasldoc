@@ -61,13 +61,13 @@ module NaslDoc
 				@funcs_pub = @functions.reject { |n, p| @funcs_prv.key? n }
 
 				# Collect the globals.
-				@globals = tree.all(:Global).map(&:idents).flatten.map(&:name)
+				@globals = tree.all(:Global).map(&:idents).flatten.map(&:name).sort
 
 				@globs_prv = @globals.select { |n| n =~ /^_/ }
 				@globs_pub = @globals.reject { |n| @globs_prv.include? n }
 
 				# Collect the includes.
-				@includes = tree.all(:Include).map(&:filename).map(&:text)
+				@includes = tree.all(:Include).map(&:filename).map(&:text).sort
 
 				# Parse the comments.
 				@comments = tree.all(:Comment)
