@@ -60,7 +60,7 @@ module NaslDoc
 				# Parse the comments.
 				comms.map! do |comm|
 					begin
-						NaslDoc::CLI::Comment.new(comm)
+						NaslDoc::CLI::Comment.new(comm, path)
 					rescue CommentException => e
 						# A short message is okay for format errors.
 						puts "[!!!] #{e.class.name} #{e.message}"

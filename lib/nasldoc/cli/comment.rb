@@ -22,12 +22,18 @@ module NaslDoc
       # Common attributes.
       attr_reader :type, :valid
 
+      # Freeform text attributes.
+      attr_accessor :description, :summary
+
+      # Tag attributes.
+      attr_accessor :anonparams, :categories, :deprecated, :nessus, :params
+      attr_accessor :remarks, :return
+
       # Export and function attributes.
-      attr_accessor :anonparams, :categories, :deprecated, :description, :name
-      attr_accessor :nessus, :params, :remarks, :return, :summary
+      attr_accessor :function
 
       # File attributes.
-      attr_accessor :filename
+      attr_accessor :filename, :signed
 
       # Global attributes.
       attr_accessor :variables
@@ -42,12 +48,16 @@ module NaslDoc
         'return'
       ]
 
-      def initialize(node)
-        # Create the freeform text members.
+      def initialize(node, path)
+        # Create common attributes.
+        @type = nil
+        @valid = false
+
+        # Create freeform text attributes.
         @summary = nil
         @description = nil
 
-        # Create the tag members.
+        # Create tag attributes.
         @anonparams = {}
         @categories = []
         @deprecated = nil
@@ -56,12 +66,19 @@ module NaslDoc
         @remarks = []
         @return = nil
 
+        # Create export and function attributes.
+        @function = nil
+
+        # Create file attributes.
+        @filename = nil
+        @signed = nil
+
+        # Create global attributes.
+        @variables = []
+
         # Determine if this is a nasldoc comment.
         @valid = (node.text.body =~ /^\s*##\s*$/)
         return unless @valid
-
-        # Parse the comment's text.
-        parse(node.text.body)
 
         # Remember the type.
         unless node.next.nil?
@@ -71,17 +88,20 @@ module NaslDoc
           @type = :file
         end
 
+        # Parse the comment's text.
+        parse(node.text.body)
+
         # Store any other attributes we may need, since we're not keeping a
         # reference to the node.
         case @type
         when :export
-          extract_function node.function
+          extract_function(node.function)
         when :file
-          extract_file node
+          extract_file(node, path)
         when :function
-          extract_function node
+          extract_function(node)
         when :global
-          extract_global node
+          extract_global(node)
         else
           raise UnsupportedClassException, "The class #{node.next.class.name} is not supported."
         end
@@ -89,7 +109,8 @@ module NaslDoc
 
       def parse(text)
         # Prune signature, which is often part of the first comment.
-        text.gsub!(/^#TRUSTED \h{1024}\n/, "");
+        re_sig = Regexp.new(trusted_regex)
+        text.gsub!(re_sig, "");
 
         # Remove the comment prefixes ('#') from the text.
         text.gsub!(/^#+/, '');
@@ -219,13 +240,36 @@ module NaslDoc
         "^\s*@(#{@@tags.join('|')})"
       end
 
-      def extract_function(node)
+      def trusted_regex
+        "^#TRUSTED \h{1024}\n"
       end
 
-      def extract_file(node)
+      def extract_file(node, path)
+        # Remember the filename.
+        @filename = File.basename(path)
+
+        # Determine whether the filename is signed, but don't validate the
+        # signature.
+        re_sig = Regexp.new(trusted_regex)
+        @signed = (node.text.body =~ re_sig);
+      end
+
+      def extract_function(node)
+        # Remember the function name.
+        fn = node.next
+        @function = fn.name.name
+
+        # Add in all named parameters, even ones that weren't annotated.
+        fn.params.each do |arg|
+          name = arg.name
+          next if @params.key? name
+          @params[name] = ''
+        end
       end
 
       def extract_global(node)
+        # Remember all the variables.
+        @variables = node.next.idents.map &:name
       end
     end
   end
