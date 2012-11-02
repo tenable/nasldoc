@@ -26,8 +26,8 @@ module NaslDoc
       attr_accessor :description, :summary
 
       # Tag attributes.
-      attr_accessor :anonparams, :categories, :deprecated, :nessus, :params
-      attr_accessor :remarks, :return
+      attr_accessor :anonparams, :categories, :deprecated, :includes, :nessus
+      attr_accessor :params, :remarks, :return
 
       # Export and function attributes.
       attr_accessor :function
@@ -42,6 +42,7 @@ module NaslDoc
         'anonparam',
         'category',
         'deprecated',
+        'include',
         'nessus',
         'param',
         'remark',
@@ -61,6 +62,7 @@ module NaslDoc
         @anonparams = {}
         @categories = []
         @deprecated = nil
+        @includes = []
         @nessus = nil
         @params = {}
         @remarks = []
@@ -77,7 +79,9 @@ module NaslDoc
         @variables = []
 
         # Determine if this is a nasldoc comment.
-        @valid = (node.text.body =~ /^\s*##\s*$/)
+        re_sig = Regexp.new(trusted_regex)
+        text = node.text.body.gsub(re_sig, '');
+        @valid = !Regexp.new('^\s*#{2,3}\s*$').match(text).nil?
         return unless @valid
 
         # Remember the type.
@@ -89,7 +93,7 @@ module NaslDoc
         end
 
         # Parse the comment's text.
-        parse(node.text.body)
+        parse(text)
 
         # Store any other attributes we may need, since we're not keeping a
         # reference to the node.
@@ -108,10 +112,6 @@ module NaslDoc
       end
 
       def parse(text)
-        # Prune signature, which is often part of the first comment.
-        re_sig = Regexp.new(trusted_regex)
-        text.gsub!(re_sig, "");
-
         # Remove the comment prefixes ('#') from the text.
         text.gsub!(/^#+/, '');
 
@@ -123,15 +123,18 @@ module NaslDoc
       end
 
       def parse_paragraphs(text)
-        regex = Regexp.new(tags_regex)
+        re_none = Regexp.new(/[^[:space:]]/)
+        re_tags = Regexp.new(tags_regex)
 
         # Collect together a list of paragraphs.
         min = 9999
         paras = []
         text.each_line('') do |para|
-          # Skip if the paragraph has a line starting with a tag.
-          next if para =~ regex
-          para.rstrip!.gsub!(/^[\n\r]/, '')
+          # Skip if the paragraph has a line starting with a tag, or has no
+          # content.
+          next unless para =~ re_none
+          next if para =~ re_tags
+          para.rstrip!
           paras << para
 
           # Determine the minimum indentation across all paragraphs.
@@ -227,8 +230,8 @@ module NaslDoc
               end
 
               self.send(attr + '=', block)
-            when '@remark'
-              @remarks << block
+            when '@include', '@remark'
+              self.send(attr + 's').push(block)
             else
               raise UnrecognizedTagException, "The #{tag} tag is not recognized."
             end
@@ -241,7 +244,7 @@ module NaslDoc
       end
 
       def trusted_regex
-        "^#TRUSTED \h{1024}\n"
+        "^#TRUSTED [[:xdigit:]]{1024}$"
       end
 
       def extract_file(node, path)
@@ -250,8 +253,7 @@ module NaslDoc
 
         # Determine whether the filename is signed, but don't validate the
         # signature.
-        re_sig = Regexp.new(trusted_regex)
-        @signed = (node.text.body =~ re_sig);
+        @signed = !Regexp.new(trusted_regex).match(node.text.body).nil?
       end
 
       def extract_function(node)

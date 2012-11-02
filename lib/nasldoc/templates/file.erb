@@ -1,159 +1,89 @@
+<%
+  def comment(name, type)
+    filter1 = proc { |c| c.type == type }
+
+    filter2 = case type
+    when :export, :function
+      Proc.new { |c| c.function == name }
+    when :file
+      Proc.new { |c| true }
+    when :global
+      Proc.new { |c| c.variables.include? name }
+    end
+
+    @comments.select(&filter1).select(&filter2).shift
+  end
+%>
+
+<%
+  def url(path)
+    path.gsub('.', '_').sub(/_inc$/, '.html')
+  end
+%>
+
 <html>
-	<head>
-		<title><%= @current_file %></title>
-		<link rel = 'stylesheet' type= 'text/css' href='stylesheet.css'>
-	</head>
-	<body>
-		<div id='content'>
-			<a name='top'></a>
-			<h1><%= @current_file %> Overview</h1>
-			<% if @overview.size != 0 %>
-				<p><%= @overview %></p>
-			<% end %>
-      
-      <br />
+  <head>
+    <title><%= @current_file %></title>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+  </head>
+  <body>
+    <div id="content">
+      <a name="top"></a>
+      <h1>Overview of <%= @current_file %></h1>
+      <% unless @overview.nil? %>
+      <% unless @overview.summary.nil? %>
+      <p class="summary"><%= @overview.summary %></p>
+      <% end %>
+      <% @overview.description.each do |paragraph| %>
+      <p class="description"><%= paragraph %></p>
+      <% end %>
 
-			<% if @includes.size != 0 %>
-			<h1>Defined Includes</h1>
-				<ul>
-					<% @includes.each do |i| %>
-						<li><a href="<%= i['file'].first.gsub('.', '_') %>.html"><%= i['file'].first %></a></li>
-					<% end %>
-				</ul>
-			<% end %>
-			
-			<% if @overview_includes.size != 0 %>
-			<h1>Required Includes</h1>
-				<ul>
-					<% @overview_includes.each do |i| %>
-						<li><a href="<%= i.gsub('.', '_') %>.html"><%= i %></a></li>
-					<% end %>
-				</ul>
-			<% end %>
-			
-			<table class="nopad">
-				<tr class='TableHeadingColor'>
-					<td>
-						<h1>Function Summary</h1>
-					</td>
-				</tr>
-				
-				<% argz = "" %>
-				<% @functions.each do |function| %>
-				<tr>
-					<td>
-						<% argz = function["args"] %>
-										
-						<% if function["anon_params"].size != 0 %>
-							<% function["anon_params"].each do |k,v| %>
-								<% if argz.length > 0 %>
-									<% argz << ", " %>
-								<% end %>
-								<% argz << "<i>#{k}</i>" %>
-							<% end %>
-						<% else %>
-							<% argz = function["args"] %>
-						<% end %>
-						
-						<code><a href='#<%= function["name"] %>'><%= function["name"]%>(<%= argz %>)</a></code>
-						<% summary = function['summary'].split("<br />") %>						
+      <% unless @overview.includes.empty? %>
+      <h1>Required Includes</h1>
+      <p>These files must be included by the importing code.</p>
+      <ul>
+        <% @overview.includes.each do |inc| %>
+        <li><a href="<%= url(inc) %>"><%= inc %></a></li>
+        <% end %>
+      </ul>
+      <% end %>
+      <% end %>
 
-						<% if summary[0] != "" %>
-							<% summary = summary[0] %>
-						<% elsif summary[1] != "" %>
-							<% summary = summary[1] %>
-						<% end %>
+      <% unless @includes.empty? %>
+      <h1>Automatic Includes</h1>
+      <p>These files are automatically included by the library.</p>
+      <ul>
+        <% @includes.each do |inc| %>
+        <li><a href="<%= url(inc) %>"><%= inc %></a></li>
+        <% end %>
+      </ul>
+      <% end %>
 
-						<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= summary %>
-					</td>
-				</tr>
-				<% end %>
-			</table>
-			
-			<h1>Function Details</h1>
-
-			<% @functions.each do |function| %>
-				<% argz = String.new %>
-				<% argz = function["args"] %>
-				<% if function["anon_params"].size != 0 %>
-					<% function["anon_params"].each do |k,v| %>
-						<% argz << ", <i>#{k}</i>" unless argz.include?(k) %>
-					<% end %>
-				<% else %>
-					<% argz = function["args"] %>
-				<% end %>
-			
-				<h2><a name='<%= function["name"] %>'><%= function["name"]%></a></h2>
-				<pre><b><%= function["name"]%> (<%= argz %>)</b></pre>
-				<p><%= function["summary"]%></p>
-											
-				<% if function["params"].size != 0 %>
-					<h3>Named Parameters:</h3>
-					<ul>
-					<% function["params"].each do |k,v| %>
-						<li><code><%= k %></code> - <%= v %></li>
-					<% end %>
-					</ul>
-				<% end %>
-							
-				<% if function["anon_params"].size != 0 %>
-					<h3>Anonymous Parameters:</h3>
-					<ul>
-					<% function["anon_params"].each do |k,v| %>
-						<li><code><%= k %></code> - <%= v %></li>
-					<% end %>
-					</ul>
-				<% end %>
-				
-				<% if function["deprecated"].size != 0 %>
-					<h3>Deprecated:</h3>
-					<ul>
-					<% function["deprecated"].each do |k,v| %>
-						<li><%= k %></li>
-					<% end %>
-					</ul>
-				<% end %>
-				
-				<% if function["category"].size != 0 %>
-					<h3>Function Category:</h3>
-					<ul>
-					<% function["category"].each do |k,v| %>
-						<li><code><%= k %></code></li>
-					<% end %>
-					</ul>
-				<% end %>
-				
-				<% if function["remark"].size != 0 %>
-					<h3>Function Remarks:</h3>
-					<ul>
-					<% function["remark"].each do |k,v| %>
-						<li><code><%= k %></code></li>
-					<% end %>
-					</ul>
-				<% end %>
-				
-				<% if function["nessus"].size != 0 %>
-					<h3>Nessus Version Required:</h3>
-					<ul>
-					<% function["nessus"].each do |k,v| %>
-						<li><code><%= k %></code></li>
-					<% end %>
-					</ul>
-				<% end %>
-				
-				<% if function["returns"].size != 0 %>
-					<h3>Returns:</h3>
-					<ul>
-					<% function["returns"].each do |k,v| %>
-						<li><%= v %></li>
-					<% end %>
-					</ul>
-				<% end %>
-				
-				<a href='#top'>top</a>
-
-				<hr>
-			<% end %>
-		</div>
-	</body>
+      <% {Public: @public, Private: @private}.each do |name, list| %>
+      <% unless list.empty? %>
+      <h1><%= name %> Function Summary</h1>
+      <% if name == :Public %>
+      <p>Public functions are intended to be called by the code that imports
+      this library.</p>
+      <% else %>
+      <p>Private functions are not intended to be called by the code that
+      imports this library. There is no functional difference between private
+      and public functions, only convention, and may be called as normal. </p>
+      <% end %>
+      <table class="nopad">
+        <tr class="TableHeadingColor">
+          <th>Name</th>
+          <th>Summary</th>
+        </tr>
+        <% list.keys.each do |name| %>
+        <tr>
+	  <td><%= name %></td>
+	  <td><%= comment(name, :function).summary %></td>
+        </tr>
+        <% end %>
+      </table>
+      <% end %>
+      <% end %>
+    </div>
+  </body>
 </html>

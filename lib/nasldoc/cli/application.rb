@@ -12,15 +12,14 @@ module NaslDoc
 				@options[:output_directory] = "nasldoc_ouput/"
 
 				@functions = Array.new
-				@function_count = 0
-
+				@globals = Array.new
 				@includes = Array.new
-				@overview = Array.new
-				@overview_includes = Array.new
+
+				@overview = nil
 
 				@template_dir = Pathname.new(__FILE__).realpath.to_s.gsub('cli/application.rb', 'templates')
 				@asset_dir = Pathname.new(__FILE__).realpath.to_s.gsub('cli/application.rb', 'assets')
-				@current_file = ""
+				@current_file = "(unknown)"
 			end
 
 			# For ERB Support
@@ -31,34 +30,46 @@ module NaslDoc
 
 			#
 			#
-			def build_template name, file=nil
-				if file == nil
-					file = name
-				end
+			def build_template name, path=nil
+				path ||= name
 
-				puts "[*] Creating #{File.basename file}.html..."
+				dest = File.basename(path).gsub(".", "_").sub(/_inc$/, ".html")
+				puts "[**] Creating #{dest}"
 				@erb = ERB.new File.new("#{@template_dir}/#{name}.erb").read, nil, "%"
 				html = @erb.result(get_binding)
 
-				output_file = File.basename(file).gsub(".", "_")
-
-				File.open("#{@options[:output_directory]}/#{output_file}.html", 'w+') do |f|
+				File.open("#{@options[:output_directory]}/#{dest}", 'w+') do |f|
 					f.puts html
 				end
 			end
 
-			def build_file_page(path)
+			def build_file_page path
 				puts "[*] Processing file: #{path}"
-				@current_file = File.basename(path, ".inc")
-				contents = File.open(path, 'rb') { |f| f.read }
+				@current_file = File.basename(path)
+				contents = File.open(path, "rb") { |f| f.read }
 
 				# Parse the input file.
 				tree = Nasl::Parser.new.parse(contents, path)
-				comms = tree.all(:Comment)
-				puts "[**] #{comms.size} comment(s) were found"
+
+				# Collect the functions.
+				@functions = Hash.new()
+				tree.all(:Function).map do |fn|
+					@functions[fn.name.name] = fn.params.map(&:name)
+				end
+
+				@private = @functions.select { |n, p| n =~ /^_/ }
+				@public = @functions.reject { |n, p| @private.key? n }
+
+				# Collect the globals.
+				@globals = tree.all(:Global).map(&:idents).flatten.map(&:name)
+
+				# Collect the includes.
+				@includes = tree.all(:Include).map(&:filename).map(&:text)
 
 				# Parse the comments.
-				comms.map! do |comm|
+				@comments = tree.all(:Comment)
+				puts "[**] #{@comments.size} comment(s) were found"
+				@comments.map! do |comm|
 					begin
 						NaslDoc::CLI::Comment.new(comm, path)
 					rescue CommentException => e
@@ -72,195 +83,18 @@ module NaslDoc
 						nil
 					end
 				end
-				comms.delete_if &:nil?
-				comms.keep_if &:valid
-				puts "[**] #{comms.size} nasldoc comment(s) were parsed"
+				@comments.compact!
+				@comments.keep_if &:valid
+				puts "[**] #{@comments.size} nasldoc comment(s) were parsed"
 
-				#contents = process_file_overview contents
-				#process_file_includes contents
-				#process_file contents
-				#build_template "file", file
+				# Find the overview comment.
+				@overview = @comments.select{ |c| c.type == :file }.shift
+
+				build_template "file", path
 			end
 
 			def build_file_pages
 				@file_list.each { |f| build_file_page(f) }
-			end
-
-			#
-			#
-			def process_file_overview file
-				regex = '###((\s*?.*?).*?)###$'
-
-				@overview = Array.new
-				@overview_includes = Array.new
-
-				file.scan(/#{regex}/m).each do |overview_text|
-					text = overview_text.first.gsub(/^#/, '')
-
-					text.split("\n").each do |line|
-						line.strip!
-						if line.start_with?("@") == false and line.length != 0
-							@overview << line
-						else
-							if line =~ /@include/
-								@overview_includes << line.gsub("@include", '')
-							else
-								@overview << line
-							end
-						end
-					end
-				end
-
-				@overview = @overview.join("<br />")
-
-				return file.gsub(/#{regex}/m, '')
-			end
-
-			#
-			#
-			def process_file_includes file
-				regex = '^include\([\'|\"](.*)[\'|\"]\);\n'
-
-				@includes = Array.new
-
-				file.scan(/#{regex}/).each do |include_file|
-					@include = Hash.new
-					@include["file"] = include_file
-
-					@includes << @include
-				end
-			end
-
-			def add_nasldoc_stubs file
-				regex = '[^##((\s*?.*?).*?)##]$.(^\s*)(function)(?:\s+|(\s*&\s*))(?:|([a-zA-Z0-9_]+))\s*(\()(.*?)(\))'
-				new_file = file.dup
-
-				file.scan(/#{regex}/m).each do |b1, function, b2, name, openpar, args, closepar|
-					nasldoc = ""
-					line = "#{function} #{name}#{openpar}#{args}#{closepar}"
-
-					params = args.split(",")
-
-					nasldoc << "\n##\n"
-					nasldoc << "# <Function description here>\n"
-					nasldoc << "#\n"
-					params.each do |arg|
-						nasldoc << "# @param #{arg.strip}\n"
-					end unless params.size == 0
-					nasldoc << "#\n"
-					nasldoc << "##\n"
-					nasldoc << "#{function} #{name}#{openpar}#{args}#{closepar}"
-
-					new_file = new_file.gsub(line, nasldoc)
-
-				end
-
-				puts new_file
-			end
-
-			#
-			#
-			def process_file file
-				regex = '##((\s*?.*?).*?)##$.(^\s*)(function)(?:\s+|(\s*&\s*))(?:|([a-zA-Z0-9_]+))\s*(\()(.*?)(\))'
-
-				@functions = Array.new
-
-				file.scan(/#{regex}/m).each do |comments, commentz, mod, function, space, name, openpar, args, closepar|
-					@function = Hash.new
-
-					@function["name"] = name
-					@function["args"] = args
-
-					summary = ""
-
-					comments.split("#").each do |line|
-						line = line.gsub("\n", "<br />")
-						line.strip!
-						if line.start_with?("@") == false
-							summary << " " + line
-						else
-							break
-						end
-					end
-
-					@function["summary"] = summary.strip.gsub("\n", "<br />")
-
-					@function["comments"] = comments = comments.gsub(/^#/, '').gsub("\n", "<br />")
-					@function["nasl_doc"] = comments.gsub("@", "||@").split("||")
-
-					anon_params = Hash.new
-					params = Hash.new
-					returns = Hash.new
-					deprecated = Hash.new
-					nessus = Hash.new
-					category = Hash.new
-					remark = Hash.new
-
-					@function["nasl_doc"].each do |doc|
-						if doc =~ /(\[(.*)#(.*)\])/
-							file_url = $2
-							function = $3
-							url = file_url + "_inc.html" + "#" + function
-							doc = doc.gsub($1, "<a href=\"#{url}\">#{function}</a>")
-						end
-
-						if doc =~ /(\[(.*)\])/
-							function = $2
-							url = @current_file + "_inc.html" + "#" + function
-							doc = doc.gsub($1, "<a href=\"#{url}\">#{function}</a>")
-						end
-
-						if doc =~ /@anonparam/
-							tmp = doc.sub("@anonparam", "").strip
-							parm = tmp.split(' ')[0]
-							anon_params[parm] = tmp.sub(parm, "")
-						end
-
-						if doc =~ /@param/
-							doc.sub!("@param", "").strip!
-							parm = doc.split(' ')[0]
-							desc = doc.sub(parm, "")
-							params[parm] = desc
-						end
-
-						if doc =~ /@return/
-							doc.sub!("@return", "").strip!
-							returns[doc] = doc
-						end
-
-						if doc =~ /@deprecated/
-							doc.sub!("@deprecated", "").strip!
-							deprecated[doc] = doc
-						end
-
-						if doc =~ /@nessus/
-							doc.sub!("@nessus", "").strip!
-							nessus[doc] = doc
-						end
-
-						if doc =~ /@category/
-							doc.sub!("@category", "").strip!
-							category[doc] = doc
-						end
-
-						if doc =~ /@remark/
-							doc.sub!("@remark", "").strip!
-							remark[doc] = doc
-						end
-					end
-
-					@function["anon_params"] = anon_params
-					@function["params"] = params
-					@function["returns"] = returns
-					@function["deprecated"] = deprecated
-					@function["nessus"] = nessus
-					@function["category"] = category
-					@function["remark"] = remark
-
-					@functions << @function
-				end
-
-				@function_count = @function_count + @functions.size
 			end
 
 			#
@@ -277,7 +111,7 @@ module NaslDoc
 			def print_documentation_stats
 				puts "\n\nDocumentation Statistics"
 				puts "Files: #{@file_list.size}"
-				puts "Functions: #{@function_count}"
+				puts "Functions: #{@functions.size}"
 			end
 
 			#
@@ -374,7 +208,7 @@ module NaslDoc
 				build_file_pages
 				#copy_assets
 
-				#print_documentation_stats
+				print_documentation_stats
 			end
 		end
 	end
