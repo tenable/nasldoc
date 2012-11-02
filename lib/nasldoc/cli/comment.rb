@@ -152,15 +152,26 @@ module NaslDoc
             break if beg.nil?
             fin = para.index(re_tags, beg + 1) || -1
 
+            # Pull the block out of the paragraph.
             block = para[beg..fin]
             para = para[fin..-1]
 
+            # Remove the tag from the block.
             tag = block[re_tags]
-            block = block[tag.length..-1].lstrip!
-            tag.lstrip!
-            member = tag[1..-1]
+            block = block[tag.length..-1]
+            next if block.nil?
 
-            block.gsub!(/[ \n\r\t]+/, ' ').strip!
+            # Squash all spaces on the block, being mindful that if the block is
+            # nil the tag is useless.
+            block.gsub!(/[ \n\r\t]+/, ' ')
+            next if block.nil?
+            block.strip!
+            next if block.nil?
+
+            # Squash the tag and trim the '@' off for accessing the object's
+            # attribute.
+            tag.lstrip!
+            attr = tag[1..-1]
 
             case tag
             when '@anonparam', '@param'
@@ -181,7 +192,7 @@ module NaslDoc
                 raise DuplicateTagException, "The param '#{name}' was previously declared as a @param."
               end
 
-              hash = self.send(member + 's')
+              hash = self.send(attr + 's')
               hash[name] = block
             when '@category'
               unless @categories.empty?
@@ -190,11 +201,11 @@ module NaslDoc
 
               @categories = block.split(/,/).map &:strip
             when '@deprecated', '@nessus', '@return'
-              unless self.send(member).nil?
+              unless self.send(attr).nil?
                 raise DuplicateTagException, "The #{tag} tag appears more than once."
               end
 
-              self.send(member + '=', block)
+              self.send(attr + '=', block)
             when '@remark'
               @remarks << block
             else
