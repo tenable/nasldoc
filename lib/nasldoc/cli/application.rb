@@ -21,7 +21,6 @@ module NaslDoc
 				@template_dir = Pathname.new(__FILE__).realpath.to_s.gsub('cli/application.rb', 'templates')
 				@asset_dir = Pathname.new(__FILE__).realpath.to_s.gsub('cli/application.rb', 'assets')
 				@current_file = ""
-				@tree = nil
 			end
 
 			# For ERB Support
@@ -48,29 +47,37 @@ module NaslDoc
 				end
 			end
 
-                        def build_file_page(path)
+			def build_file_page(path)
 				puts "[*] Processing file: #{path}"
 				@current_file = File.basename(path, ".inc")
 				contents = File.open(path, 'rb') { |f| f.read }
 
 				# Parse the input file.
 				tree = Nasl::Parser.new.parse(contents, path)
-                                comms = tree.all(:Comment)
-                                puts "[**] #{comms.size} comment(s) were found"
+				comms = tree.all(:Comment)
+				puts "[**] #{comms.size} comment(s) were found"
 
 				# Parse the comments.
-                                comms.map! { |c| NaslDoc::CLI::Comment.new(c) }
-                                comms.keep_if &:valid
-                                puts "[**] #{comms.size} nasldoc comment(s) were parsed"
+				comms.map! do |comm|
+					begin
+						NaslDoc::CLI::Comment.new(comm)
+					rescue CommentException => e
+						puts "[!!!] #{e.class.name} #{e.message}"
+						nil
+					end
+				end
+				comms.delete_if &:nil?
+				comms.keep_if &:valid
+				puts "[**] #{comms.size} nasldoc comment(s) were parsed"
 
 				#contents = process_file_overview contents
 				#process_file_includes contents
 				#process_file contents
 				#build_template "file", file
-                        end
+			end
 
 			def build_file_pages
-                          @file_list.each { |f| build_file_page(f) }
+				@file_list.each { |f| build_file_page(f) }
 			end
 
 			#
@@ -342,16 +349,16 @@ module NaslDoc
 					@file_list << ARGV.first
 				end
 
-                                # Ensure the output directory exists.
+				# Ensure the output directory exists.
 				if File.directory?(@options[:output_directory]) == false
 					Dir.mkdir @options[:output_directory]
 				end
 
-                                # Get rid of non-NASL files.
+				# Get rid of non-NASL files.
 				@file_list = remove_blacklist(@file_list)
 
-                                # Ensure we process files in a consistent order.
-                                @file_list.sort!
+				# Ensure we process files in a consistent order.
+				@file_list.sort!
 
 				puts "[*] Building documentation..."
 

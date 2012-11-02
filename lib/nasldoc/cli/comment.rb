@@ -1,18 +1,21 @@
 module NaslDoc
   module CLI
-    class DuplicateArgumentException < Exception
+    class CommentException < Exception
     end
 
-    class DuplicateTagException < Exception
+    class DuplicateArgumentException < CommentException
     end
 
-    class TagFormatException < Exception
+    class DuplicateTagException < CommentException
     end
 
-    class UnrecognizedTagException < Exception
+    class TagFormatException < CommentException
     end
 
-    class UnsupportedClassException < Exception
+    class UnrecognizedTagException < CommentException
+    end
+
+    class UnsupportedClassException < CommentException
     end
 
     class Comment
@@ -22,6 +25,9 @@ module NaslDoc
       # Export and function attributes.
       attr_accessor :anonparams, :categories, :deprecated, :description, :name
       attr_accessor :nessus, :params, :remarks, :return, :summary
+
+      # File attributes.
+      attr_accessor :filename
 
       # Global attributes.
       attr_accessor :variables
@@ -45,13 +51,20 @@ module NaslDoc
         parse(node.text.body)
 
         # Remember the type.
-        @type = node.next.class.name.gsub(/.*::/, '').downcase.to_sym
+        unless node.next.nil?
+          @type = node.next.class.name.gsub(/.*::/, '').downcase.to_sym
+        else
+          # The first comment in a file might not have a next node.
+          @type = :file
+        end
 
         # Store any other attributes we may need, since we're not keeping a
         # reference to the node.
         case @type
         when :export
           extract_function node.function
+        when :file
+          extract_file node
         when :function
           extract_function node
         when :global
@@ -157,11 +170,11 @@ module NaslDoc
 
               # Check for previous declarations of this name.
               if @anonparams.key?(name)
-                raise DuplicateTagException, "The param '#{name}' was previously declared as an '@anonparam'."
+                raise DuplicateTagException, "The param '#{name}' was previously declared as an @anonparam."
               end
 
               if @params.key?(name)
-                raise DuplicateTagException, "The param '#{name}' was previously declared as a '@param'."
+                raise DuplicateTagException, "The param '#{name}' was previously declared as a @param."
               end
 
               hash = self.send(member + 's')
@@ -192,6 +205,9 @@ module NaslDoc
       end
 
       def extract_function(node)
+      end
+
+      def extract_file(node)
       end
 
       def extract_global(node)
