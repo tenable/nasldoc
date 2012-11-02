@@ -7,6 +7,7 @@ $stderr.sync = true
 
 require 'rubygems'
 require 'nasldoc'
+require 'nasl'
 
 app = NaslDoc::CLI::Application.new
 app.main
