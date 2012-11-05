@@ -131,6 +131,7 @@ module NaslDoc
 					"blacklist_ssl_rsa2048.inc",
 					"custom_CA.inc",
 					"daily_badip.inc",
+					"daily_badip2.inc",
 					"daily_badurl.inc",
 					"known_CA.inc",
 					"sc_families.inc"
