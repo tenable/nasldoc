@@ -1,20 +1,19 @@
 <html>
-	<head>
-		<title>nasldoc</title>
-		<link rel = 'stylesheet' type= 'text/css' href='stylesheet.css'>
-	</head>
-	<body>
-		<img src='nessus.jpg' />
-		<br><br><br>
-		<ul>
-			<% @file_list.sort.each_with_index do |file, i| %>
-				<% row_class = i % 2 == 0 ? "even" : "odd" %> 
-				<% output_file = file.gsub(".", "_") %>
-				<% output_file = File.basename(file).gsub(".", "_") %>
-				<li class="<%= row_class %>"><a href='<%= output_file %>.html' target='content'><%= File.basename(file) %></a></li>
-			<% end %>
-		</ul>
-		<br><br><br>
-		<ul><a href='overview.html' target='content'>Home</a></ul>
-	</body>
+  <head>
+    <title>nasldoc</title>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  </head>
+  <body>
+    <img src="nessus.jpg" />
+    <ul>
+      <li><a href="overview.html" target="content">Overview</a></li>
+    </ul>
+    <ul>
+      <% @file_list.sort.each_with_index do |file, i| %>
+      <% row = i.even? ? 'even' : 'odd' %>
+      <% link = url(file) %>
+      <li class="<%= row %>"><a href="<%= link %>" target="content"><%= link %></a></li>
+      <% end %>
+    </ul>
+  </body>
 </html>

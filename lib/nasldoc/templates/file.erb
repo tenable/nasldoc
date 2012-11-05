@@ -26,12 +26,6 @@
   end
 %>
 
-<%
-  def url(path)
-    path.gsub('.', '_').sub(/_inc$/, '.html')
-  end
-%>
-
 <html>
   <head>
     <title><%= @current_file %></title>
@@ -53,7 +47,7 @@
       <h1>Required Includes</h1>
       <p>These files must be included by the importing code.</p>
       <ul>
-        <% @overview.includes.each do |inc| %>
+        <% @overview.includes.sort.each do |inc| %>
         <li><a href="<%= url(inc) %>"><%= inc %></a></li>
         <% end %>
       </ul>
@@ -64,7 +58,7 @@
       <h1>Automatic Includes</h1>
       <p>These files are automatically included by the library.</p>
       <ul>
-        <% @includes.each do |inc| %>
+        <% @includes.sort.each do |inc| %>
         <li><a href="<%= url(inc) %>"><%= inc %></a></li>
         <% end %>
       </ul>
@@ -89,7 +83,7 @@
           <th>Name</th>
           <th>Summary</th>
         </tr>
-        <% list.each do |name| %>
+        <% list.sort.each do |name| %>
         <tr>
           <td><a href="#<%= name %>"><%= name %></a></td>
           <td><%= safe(comment(name, :global), "", :summary) %></td>
@@ -168,7 +162,7 @@
       <% unless comm.categories.empty? %>
       <h3>Categories</h3>
       <ul>
-      <% comm.categories.each do |cat| %>
+      <% comm.categories.sort.each do |cat| %>
       <li><%= cat %></li>
       <% end %>
       </ul>
@@ -221,7 +215,7 @@
       <% unless comm.categories.empty? %>
       <h3>Categories</h3>
       <ul>
-      <% comm.categories.each do |cat| %>
+      <% comm.categories.sort.each do |cat| %>
       <li><%= cat %></li>
       <% end %>
       </ul>
@@ -230,7 +224,7 @@
       <% unless comm.anonparams.empty? %>
       <h3>Anonymous Parameters</h3>
       <dl>
-      <% comm.anonparams.each do |name, block| %>
+      <% comm.anonparams.sort.each do |name, block| %>
         <dt><%= name %></dt>
         <dd><%= block %></dd>
       <% end %>
@@ -241,9 +235,9 @@
       <% unless @functions[name].nil? || @functions[name].empty? %>
       <h3>Named Parameters</h3>
       <dl>
-      <% @functions[name].each do |name| %>
+      <% @functions[name].sort.each do |name| %>
         <dt><%= name %></dt>
-        <% unless comm.nil? || !comm.params[name].has_key?(name) %>
+        <% unless comm.nil? || !comm.params.has_key?(name) %>
         <dd><%= comm.params[name] %></dd>
         <% end %>
       <% end %>

@@ -28,12 +28,16 @@ module NaslDoc
 				binding
 			end
 
+			def url path
+				File.basename(path).gsub('.', '_').sub(/_inc$/, '.html')
+			end
+
 			#
 			#
 			def build_template name, path=nil
 				path ||= name
 
-				dest = File.basename(path).gsub(".", "_").sub(/_inc$/, ".html")
+				dest = File.basename(path).gsub(".", "_").sub(/_inc$/, "") + ".html"
 				puts "[**] Creating #{dest}"
 				@erb = ERB.new File.new("#{@template_dir}/#{name}.erb").read, nil, "%"
 				html = @erb.result(get_binding)
@@ -209,7 +213,7 @@ module NaslDoc
 				build_template "sidebar"
 				build_template "overview"
 				build_file_pages
-				#copy_assets
+				copy_assets
 
 				print_documentation_stats
 			end
