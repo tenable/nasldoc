@@ -134,7 +134,10 @@ module NaslDoc
 					"daily_badip2.inc",
 					"daily_badurl.inc",
 					"known_CA.inc",
-					"sc_families.inc"
+					"oui.inc",
+					"plugin_feed_info.inc",
+					"sc_families.inc",
+					"ssl_known_cert.inc"
 				]
 
 				new_file_list = file_list.dup
