@@ -224,42 +224,42 @@ module NaslDoc
             attr = tag[1..-1]
 
             case tag
-            when '@anonparam', '@param'
-              # Parse the argument name.
-              name = block[re_name]
-              block = block[name.length..-1].lstrip!
+              when '@anonparam', '@param'
+                # Parse the argument name.
+                name = block[re_name]
+                block = block[name.length..-1].lstrip!
 
-              if name.empty?
-                raise TagFormatException, "Failed to parse the #{tag}'s name."
-              end
+                if name.empty?
+                  raise TagFormatException, "Failed to parse the #{tag}'s name."
+                end
 
-              # Check for previous declarations of this name.
-              if @anonparams.key?(name)
-                raise DuplicateTagException, "The param '#{name}' was previously declared as an @anonparam."
-              end
+                # Check for previous declarations of this name.
+                if @anonparams.key?(name)
+                  raise DuplicateTagException, "The param '#{name}' was previously declared as an @anonparam."
+                end
 
-              if @params.key?(name)
-                raise DuplicateTagException, "The param '#{name}' was previously declared as a @param."
-              end
+                if @params.key?(name)
+                  raise DuplicateTagException, "The param '#{name}' was previously declared as a @param."
+                end
 
-              hash = self.send(attr + 's')
-              hash[name] = block
-            when '@category'
-              unless @categories.empty?
-                raise DuplicateTagException, "The #{tag} tag appears more than once."
-              end
+                hash = self.send(attr + 's')
+                hash[name] = block
+              when '@category'
+                unless @categories.empty?
+                  raise DuplicateTagException, "The #{tag} tag appears more than once."
+                end
 
-              @categories = block.split(/,/).map &:strip
-            when '@deprecated', '@nessus', '@return'
-              unless self.send(attr).nil?
-                raise DuplicateTagException, "The #{tag} tag appears more than once."
-              end
+                @categories = block.split(/,/).map &:strip
+              when '@deprecated', '@nessus', '@return'
+                unless self.send(attr).nil?
+                  raise DuplicateTagException, "The #{tag} tag appears more than once."
+                end
 
-              self.send(attr + '=', block)
-            when '@include', '@remark'
-              self.send(attr + 's').push(block)
-            else
-              raise UnrecognizedTagException, "The #{tag} tag is not recognized."
+                self.send(attr + '=', block)
+              when '@include', '@remark'
+                self.send(attr + 's').push(block)
+              else
+                raise UnrecognizedTagException, "The #{tag} tag is not recognized."
             end
           end
         end
