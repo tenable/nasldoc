@@ -20,7 +20,7 @@ module NaslDoc
 
     class Comment
       # Common attributes.
-      attr_reader :type, :valid
+      attr_reader :name, :type, :valid
 
       # Freeform text attributes.
       attr_accessor :description, :summary
@@ -51,6 +51,7 @@ module NaslDoc
 
       def initialize(node, path)
         # Create common attributes.
+        @name = nil
         @type = nil
         @valid = false
 
@@ -79,9 +80,8 @@ module NaslDoc
         @variables = []
 
         # Determine if this is a nasldoc comment.
-        re_sig = Regexp.new(trusted_regex)
-        text = node.text.body.gsub(re_sig, '');
-        @valid = !Regexp.new('^\s*#{2,3}\s*$').match(text).nil?
+        text = node.text.body;
+        @valid = !Regexp.new("(^\s*\#{2,3}\s*$|#{trusted_regex})").match(text).nil?
         return unless @valid
 
         # Remember the type.
@@ -91,9 +91,6 @@ module NaslDoc
           # The first comment in a file might not have a next node.
           @type = :file
         end
-
-        # Parse the comment's text.
-        parse(text)
 
         # Store any other attributes we may need, since we're not keeping a
         # reference to the node.
@@ -109,9 +106,16 @@ module NaslDoc
         else
           raise UnsupportedClassException, "The class #{node.next.class.name} is not supported."
         end
+
+        # Parse the comment's text.
+        parse(text)
       end
 
       def parse(text)
+        # Remove the trusted header.
+        re_sig = Regexp.new(trusted_regex)
+        text.gsub!(re_sig, '');
+
         # Remove the comment prefixes ('#') from the text.
         text.gsub!(/^#+/, '');
 
@@ -204,36 +208,36 @@ module NaslDoc
               block = block[name.length..-1].lstrip!
 
               if name.empty?
-                raise TagFormatException, "Failed to parse the #{tag}'s name."
+                raise TagFormatException, "Failed to parse the #{tag}'s name for #@name."
               end
 
               # Check for previous declarations of this name.
               if @anonparams.key?(name)
-                raise DuplicateTagException, "The param '#{name}' was previously declared as an @anonparam."
+                raise DuplicateTagException, "The param '#{name}' was previously declared as an @anonparam for #@name."
               end
 
-              if @params.key?(name)
-                raise DuplicateTagException, "The param '#{name}' was previously declared as a @param."
+              if @params.key?(name) and not @params[name].nil?
+                raise DuplicateTagException, "The param '#{name}' was previously declared as a @param for #@name."
               end
 
               hash = self.send(attr + 's')
               hash[name] = block
             when '@category'
               unless @categories.empty?
-                raise DuplicateTagException, "The #{tag} tag appears more than once."
+                raise DuplicateTagException, "The #{tag} tag appears more than once for #@name."
               end
 
               @categories = block.split(/,/).map &:strip
             when '@deprecated', '@nessus', '@return'
               unless self.send(attr).nil?
-                raise DuplicateTagException, "The #{tag} tag appears more than once."
+                raise DuplicateTagException, "The #{tag} tag appears more than once for #@name."
               end
 
               self.send(attr + '=', block)
             when '@include', '@remark'
               self.send(attr + 's').push(block)
             else
-              raise UnrecognizedTagException, "The #{tag} tag is not recognized."
+              raise UnrecognizedTagException, "The #{tag} tag is not recognized in #@name."
             end
           end
         end
@@ -251,6 +255,9 @@ module NaslDoc
         # Remember the filename.
         @filename = File.basename(path)
 
+        # Name this comment for use in error messages.
+        @name = "file #@filename"
+
         # Determine whether the filename is signed, but don't validate the
         # signature.
         @signed = !Regexp.new(trusted_regex).match(node.text.body).nil?
@@ -261,17 +268,19 @@ module NaslDoc
         fn = node.next
         @function = fn.name.name
 
+        # Name this comment for use in error messages.
+        @name = "function #@function"
+
         # Add in all named parameters, even ones that weren't annotated.
-        fn.params.each do |arg|
-          name = arg.name
-          next if @params.key? name
-          @params[name] = ''
-        end
+        fn.params.each { |arg| @params[arg.name] = nil }
       end
 
       def extract_global(node)
         # Remember all the variables.
         @variables = node.next.idents.map &:name
+
+        # Name this comment for use in error messages.
+        @name = "global variable(s) #{@variables.join(', ')}"
       end
     end
   end

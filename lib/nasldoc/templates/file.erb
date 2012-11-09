@@ -43,6 +43,14 @@
       <p class="description"><%= paragraph %></p>
       <% end %>
 
+      <% if @overview.signed %>
+      <h1>Signed</h1>
+      <p>This library contains a signature, indicating that it is permitted to
+      call trusted builtin functions.</p>
+      <p class="warning">The signature on this library has not been checked, so
+      there is no guarantee it will run in Nessus.</p>
+      <% end %>
+
       <% unless @overview.includes.empty? %>
       <h1>Required Includes</h1>
       <p>These files must be included by the importing code.</p>
