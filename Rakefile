@@ -24,18 +24,30 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
+$:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 
 require 'rubygems'
 require "nasldoc"
 require 'rake'
+require 'rake/testtask'
  
 task :build do
   system "gem build #{NaslDoc::APP_NAME}.gemspec"
 end
- 
-task :release => :build do
+
+task :tag_and_bag do
+	system "git tag -a #{NaslDoc::VERSION} -m 'version #{NaslDoc::VERSION}'"
+	system "git push --tags"
+end
+
+task :release => [:tag_and_bag, :build] do
   system "gem push  #{NaslDoc::APP_NAME}-#{NaslDoc::VERSION}.gem"
+end
+
+task :merge do
+	system "git checkout master"
+	system "git merge #{NaslDoc::Version}"
+	system "git push"
 end
 
 task :clean do
@@ -45,3 +57,11 @@ task :clean do
 	system "rm *.pdf"	
 	system "rm -rf coverage"
 end
+
+Rake::TestTask.new("test") do |t|
+	t.libs << "test"
+	t.pattern = "test/*/*_test.rb"
+	t.verbose = true
+end
+
+task :default => [:test]
