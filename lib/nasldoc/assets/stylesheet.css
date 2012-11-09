@@ -3,7 +3,8 @@
 /* Define colors, fonts and other style attributes here to override the defaults */
 
 /* Page background color */
-body {
+body 
+{
 	background-color: #FFFFFF;
 	margin-left: 0px;
 	margin-top: 0px;
@@ -14,41 +15,53 @@ body {
 	background-position: center;
 }
 
-#content {
+#content 
+{
   padding: 5px;
 }
 
-table.nopad {
+table.nopad 
+{
   border:1px solid black;
   width:100%;
   border-collapse: collapse;
 }
 
-.odd {
+.odd 
+{
   background-color: #EEEEEE;
 }
 
-.even {
+.even 
+{
   background-color: white;
 }
 
-tr {
+tr 
+{
   border:1px solid black;
   padding:0px;
 }
 
-td {
+td 
+{
   border:1px solid black;
   padding:0px;
 }
 
-.header {
+.header 
+{
   background: #EEEEEE;
   width: 100%;
 }
-.TableHeadingColor     { background: #EEEEEE } 
 
-td,p, li, ul {
+.TableHeadingColor     
+{ 
+	background: #EEEEEE;
+} 
+
+td,p, li, ul 
+{
 	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	line-height: 16px;
@@ -57,28 +70,34 @@ td,p, li, ul {
 	text-decoration: none;
 }
 
-a {
+a 
+{
 	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	font-weight: normal;
 	color: #397AB2;
 	text-decoration: underline;
 }
-a:link {
+
+a:link 
+{
 	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	font-weight: normal;
 	color: #397AB2;
 	text-decoration: underline;
 }
-a:hover {
+
+a:hover 
+{
 	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	font-weight: normal;
 	color: #4E6F9A;
 }
 
-h1 {
+h1 
+{
 	font-family: Helvetica Neue, Verdana, Arial, Helvetica, sans-serif;
 	font-size: 26px;
 	font-style: normal;
