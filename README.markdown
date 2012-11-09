@@ -34,7 +34,6 @@ The function description block is free form text from the first ## to the first 
 
 #Example
 
-
 	## 
 	# An example addition function in NASL
 	#
@@ -74,4 +73,3 @@ Nasldoc uses the ERB templating engine to make generating the output html dead s
 			<ul><a href='overview.html' target='content'>Home</a></ul>
 		</body>
 	</html>
-
