@@ -29,10 +29,18 @@ require 'nasldoc/cli/comment'
 module NaslDoc
 	module CLI
 		class Application
-			#
+			attr_accessor :error_count
+
+			# Initializes the Application class
+			# 
+			# - Sets the default output directory to nasldoc_output/
+			# - Sets the template directory to lib/templates
+			# - Sets the assets directory to lib/assets
 			#
 			def initialize
 				@file_list = Array.new
+				@function_count = 0
+				@error_count = 0
 				@options = Hash.new
 
 				@options[:output_directory] = "nasldoc_ouput/"
@@ -50,16 +58,19 @@ module NaslDoc
 
 			# For ERB Support
 			#
+			# @return ERB Binding for access to instance variables in templates
 			def get_binding
 				binding
 			end
 
+			# Generates a HTML base name for a path
+			#
+			# @return htmlized file name for .inc file
 			def url path
 				File.basename(path).gsub('.', '_').sub(/_inc$/, '.html')
 			end
 
-			#
-			#
+			# Compiles a template for each file
 			def build_template name, path=nil
 				path ||= name
 
@@ -73,6 +84,7 @@ module NaslDoc
 				end
 			end
 
+			# Processes each .inc file and sets instance variables for each template
 			def build_file_page path
 				puts "[*] Processing file: #{path}"
 				@current_file = File.basename(path)
@@ -85,6 +97,7 @@ module NaslDoc
 				@functions = Hash.new()
 				tree.all(:Function).map do |fn|
 					@functions[fn.name.name] = fn.params.map(&:name)
+					@function_count += 1
 				end
 
 				@funcs_prv = @functions.select { |n, p| n =~ /^_/ }
@@ -108,6 +121,7 @@ module NaslDoc
 					rescue CommentException => e
 						# A short message is okay for format errors.
 						puts "[!!!] #{e.class.name} #{e.message}"
+						@error_count += 1
 						nil
 					rescue Exception => e
 						# A detailed message is given for programming errors.
@@ -126,12 +140,14 @@ module NaslDoc
 				build_template "file", path
 			end
 
+			# Builds each page from the file_list
 			def build_file_pages
-				@file_list.each { |f| build_file_page(f) }
+				@file_list.each do |f| 
+					build_file_page(f) 
+				end
 			end
 
-			#
-			#
+			# Copies required assets to the final build directory
 			def copy_assets
 				puts "[*] Copying stylesheet.css to output dir"
 				`cp #{@asset_dir}/stylesheet.css #{@options[:output_directory]}`
@@ -139,16 +155,15 @@ module NaslDoc
 				`cp #{@asset_dir}/nessus.jpg #{@options[:output_directory]}`
 			end
 
-			#
-			#
+			# Prints documentation stats to stdout
 			def print_documentation_stats
 				puts "\n\nDocumentation Statistics"
 				puts "Files: #{@file_list.size}"
-				puts "Functions: #{@functions.size}"
+				puts "Functions: #{@function_count}"
+				puts "Errors: #{@error_count}"
 			end
 
-			#
-			#
+			# Removes blacklisted files from the file list
 			def remove_blacklist file_list
 				blacklist = [
 					"blacklist_dss.inc",
@@ -179,11 +194,10 @@ module NaslDoc
 				return new_file_list
 			end
 
-			#
-			#
+			# Parses the command line arguments
 			def parse_args
 				opts = OptionParser.new do |opt|
-					opt.banner =	"#{APP_NAME} v#{VERSION}\nJacob Hammack\njhammack@tenable.com\n\n"
+					opt.banner =	"#{APP_NAME} v#{VERSION}\nTenable Network Security.\njhammack@tenable.com\n\n"
 					opt.banner << "Usage: #{APP_NAME} [options] [file|directory]"
 					opt.separator('')
 					opt.separator("Options")
@@ -200,7 +214,7 @@ module NaslDoc
 						exit
 					end
 
-					opt.on_tail("-?", "--help", "Show this message") do
+					opt.on_tail('-?', '--help', 'Show this message') do
 						puts opt.to_s + "\n"
 						exit
 					end
@@ -209,14 +223,13 @@ module NaslDoc
 				if ARGV.length != 0
 					opts.parse!
 				else
-					puts opts.to_s + "\n"
+					puts opts.to_s + '\n'
 					exit
 				end
 			end
 
-			#
-			#
-			def main
+			# Main function for running nasldoc
+			def run
 				parse_args
 
 				if File.directory?(ARGV.first) == true
@@ -242,6 +255,7 @@ module NaslDoc
 				build_template "index"
 				build_template "sidebar"
 				build_template "overview"
+
 				build_file_pages
 				copy_assets
 
