@@ -1,5 +1,8 @@
 # News
 
+#0.1.0 (November 2012)
+- 
+
 #0.0.9 (March 2012)
 - Fixed a show stopper
 
