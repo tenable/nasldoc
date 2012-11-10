@@ -1,267 +1,364 @@
 <%
   def comment(name, type)
-    filter1 = proc { |c| c.type == type }
+	filter1 = proc { |c| c.type == type }
 
-    filter2 = case type
-    when :export, :function
-      Proc.new { |c| c.function == name }
-    when :file
-      Proc.new { |c| true }
-    when :global
-      Proc.new { |c| c.variables.include? name }
-    end
+	filter2 = case type
+	when :export, :function
+	  Proc.new { |c| c.function == name }
+	when :file
+	  Proc.new { |c| true }
+	when :global
+	  Proc.new { |c| c.variables.include? name }
+	end
 
-    @comments.select(&filter1).select(&filter2).shift
+	@comments.select(&filter1).select(&filter2).shift
   end
 %>
 
 <%
   def safe(obj, default, *attrs)
-    attrs.each do |attr|
-      return default unless obj.respond_to? attr
-      obj = obj.send(attr)
-    end
+	attrs.each do |attr|
+	  return default unless obj.respond_to? attr
+	  obj = obj.send(attr)
+	end
 
-    obj
+	obj
   end
 %>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <title><%= @current_file %></title>
-    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+  <meta charset="utf-8">
+  <title>nasldoc: nasl</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Le styles -->
+  <link href="assets/css/bootstrap.css" rel="stylesheet">
+  <style type="text/css">
+	body {
+	padding-top: 60px;
+	padding-bottom: 40px;
+	}
+	.sidebar-nav {
+	padding: 9px 0;
+	}
+  </style>
+  <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+
+  <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <!-- Fav and touch icons -->
+  <link rel="shortcut icon" href="assets/ico/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
   </head>
+
   <body>
-    <div id="content">
-      <a name="top"></a>
-      <h1>Overview of <%= @current_file %></h1>
-      <% unless @overview.nil? %>
-      <% unless @overview.summary.nil? %>
-      <p class="summary"><%= @overview.summary %></p>
-      <% end %>
-      <% @overview.description.each do |paragraph| %>
-      <p class="description"><%= paragraph %></p>
-      <% end %>
 
-      <% if @overview.signed %>
-      <h1>Signed</h1>
-      <p>This library contains a signature, indicating that it is permitted to
-      call trusted builtin functions.</p>
-      <p class="warning">The signature on this library has not been checked, so
-      there is no guarantee it will run in Nessus.</p>
-      <% end %>
+	<div class="navbar navbar-inverse navbar-fixed-top">
+	  <div class="navbar-inner">
+		<div class="container-fluid">
+		  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		  </a>
+		  <a class="brand" href="index.html">nasldoc</a>
+		  <div class="nav-collapse collapse">
+			<ul class="nav">
+			  <li class="active"><a href="index.html">Home</a></li>
+			</ul>
+		  </div><!--/.nav-collapse -->
+		</div>
+	  </div>
+	</div>
 
-      <% unless @overview.includes.empty? %>
-      <h1>Required Includes</h1>
-      <p>These files must be included by the importing code.</p>
-      <ul>
-        <% @overview.includes.sort.each do |inc| %>
-        <li><a href="<%= url(inc) %>"><%= inc %></a></li>
-        <% end %>
-      </ul>
-      <% end %>
-      <% end %>
+  <div class="container-fluid">
+	<div class="row-fluid">
+	<div class="span3">
+	  <div class="well sidebar-nav">
+	  <ul class="nav nav-list">
+		<% @file_list.sort.each_with_index do |file, i| %>
+			<% row = i.even? ? 'even' : 'odd' %>
+			<% link = url(file) %>
+			<li class="<%= row %>">
+			  <a href="<%= link %>" target="content"><%= link.gsub('.html', '.inc') %></a>
+			</li>
+		<% end %>
+	  </ul>
+	  </div><!--/.well -->
+	</div><!--/span-->
+	<div class="span9">
 
-      <% unless @includes.empty? %>
-      <h1>Automatic Includes</h1>
-      <p>These files are automatically included by the library.</p>
-      <ul>
-        <% @includes.sort.each do |inc| %>
-        <li><a href="<%= url(inc) %>"><%= inc %></a></li>
-        <% end %>
-      </ul>
-      <% end %>
+		<a name="top"></a>
+		<h1>Overview of <%= @current_file %></h1>
+		<% unless @overview.nil? %>
+		<% unless @overview.summary.nil? %>
+		<p class="summary"><%= @overview.summary %></p>
+		<% end %>
+		<% @overview.description.each do |paragraph| %>
+		<p class="description"><%= paragraph %></p>
+		<% end %>
 
-      <% {Public: @globs_pub, Private: @globs_prv}.each do |name, list| %>
-      <% unless list.empty? %>
-      <h1><%= name %> Variable Summary</h1>
+		<% if @overview.signed %>	
+			<h1>Signed</h1>
+			<p>This library contains a signature, indicating that it is permitted to
+			call trusted builtin functions.</p>
+			<p class="warning">The signature on this library has not been checked, so
+			there is no guarantee it will run in Nessus.</p>
+		<% end %>
 
-      <% if name == :Public %>
-      <p>Public variables are intended to be accessed by the code that imports
-      this library.</p>
-      <% else %>
-      <p>Private variables are not intended to be accessed by the code that
-      imports this library. There is no functional difference between private
-      and public variables, only convention, and they may be accessed as
-      normal. </p>
-      <% end %>
+		<% unless @overview.includes.empty? %>
+		
+		<h1>Required Includes</h1>
+		<p>These files must be included by the importing code.</p>
+		<ul>
+		  <% @overview.includes.sort.each do |inc| %>
+		  <li><a href="<%= url(inc) %>"><%= inc %></a></li>
+		  <% end %>
+		</ul>
+		<% end %>
+		<% end %>
 
-      <table class="nopad">
-        <tr class="TableHeadingColor">
-          <th>Name</th>
-          <th>Summary</th>
-        </tr>
-        <% list.sort.each do |name| %>
-        <tr>
-          <td><a href="#<%= name %>"><%= name %></a></td>
-          <td><%= safe(comment(name, :global), "", :summary) %></td>
-        </tr>
-        <% end %>
-      </table>
-      <% end %>
-      <% end %>
+		<% unless @includes.empty? %>
+		
+		<h1>Automatic Includes</h1>
+		<p>These files are automatically included by the library.</p>
+		<ul>
+		  <% @includes.sort.each do |inc| %>
+		  <li><a href="<%= url(inc) %>"><%= inc %></a></li>
+		  <% end %>
+		</ul>
+		<% end %>
 
-      <% {Public: @funcs_pub, Private: @funcs_prv}.each do |name, list| %>
-      <% unless list.empty? %>
-      <h1><%= name %> Function Summary</h1>
+		<% {Public: @globs_pub, Private: @globs_prv}.each do |name, list| %>
+		<% unless list.empty? %>
+		
+		<h1><%= name %> Variable Summary</h1>
 
-      <% if name == :Public %>
-      <p>Public functions are intended to be called by the code that imports
-      this library.</p>
-      <% else %>
-      <p>Private functions are not intended to be called by the code that
-      imports this library. There is no functional difference between private
-      and public functions, only convention, and they may be called as
-      normal. </p>
-      <% end %>
+		<% if name == :Public %>
+		<p>Public variables are intended to be accessed by the code that imports
+		this library.</p>
+		<% else %>
+		<p>Private variables are not intended to be accessed by the code that
+		imports this library. There is no functional difference between private
+		and public variables, only convention, and they may be accessed as
+		normal. </p>
+		<% end %>
 
-      <table class="nopad">
-        <tr class="TableHeadingColor">
-          <th>Name</th>
-          <th>Summary</th>
-        </tr>
-        <% list.keys.sort.each do |name| %>
-        <tr>
-          <td><a href="#<%= name %>"><%= name %></a></td>
-          <td><%= safe(comment(name, :function), "", :summary) %></td>
-        </tr>
-        <% end %>
-      </table>
-      <% end %>
-      <% end %>
+		<table class="nopad">
+		  <tr class="TableHeadingColor">
+			<th>Name</th>
+			<th>Summary</th>
+		  </tr>
+		  <% list.sort.each do |name| %>
+		  <tr>
+			<td><a href="#<%= name %>"><%= name %></a></td>
+			<td><%= safe(comment(name, :global), "", :summary) %></td>
+		  </tr>
+		  <% end %>
+		</table>
+		<% end %>
+		<% end %>
 
-      <% {Public: @globs_pub, Private: @globs_prv}.each do |name, list| %>
-      <% unless list.empty? %>
-      <h1><%= name %> Variable Details</h1>
-      <% list.sort.each do |name| %>
-      <h2 id="<%= name %>"><%= name %></h2>
-      <% comm = comment(name, :global) %>
+		<% {Public: @funcs_pub, Private: @funcs_prv}.each do |name, list| %>
+		<% unless list.empty? %>
+		<h1><%= name %> Function Summary</h1>
 
-      <% unless comm.nil? %>
-      <% unless comm.summary.nil? %>
-      <h3>Summary</h3>
-      <p class="summary"><%= comm.summary %></p>
-      <% end %>
+		<% if name == :Public %>
+		<p>Public functions are intended to be called by the code that imports
+		this library.</p>
+		<% else %>
+		<p>Private functions are not intended to be called by the code that
+		imports this library. There is no functional difference between private
+		and public functions, only convention, and they may be called as
+		normal. </p>
+		<% end %>
 
-      <% unless comm.description.empty? %>
-      <h3>Description</h3>
-      <% comm.description.each do |para| %>
-      <p class="description"><%= para %></p>
-      <% end %>
-      <% end %>
+		<table class="nopad">
+		  <tr class="TableHeadingColor">
+			<th>Name</th>
+			<th>Summary</th>
+		  </tr>
+		  <% list.keys.sort.each do |name| %>
+		  <tr>
+			<td><a href="#<%= name %>"><%= name %></a></td>
+			<td><%= safe(comment(name, :function), "", :summary) %></td>
+		  </tr>
+		  <% end %>
+		</table>
+		<% end %>
+		<% end %>
 
-      <% unless comm.remarks.empty? %>
-      <h3>Remarks</h3>
-      <% comm.remarks.each do |rem| %>
-      <p class="remark"><%= rem %></p>
-      <% end %>
-      <% end %>
+		<% {Public: @globs_pub, Private: @globs_prv}.each do |name, list| %>
+		<% unless list.empty? %>
+		<h1><%= name %> Variable Details</h1>
+		<% list.sort.each do |name| %>
+		<h2 id="<%= name %>"><%= name %></h2>
+		<% comm = comment(name, :global) %>
 
-      <% unless comm.deprecated.nil? %>
-      <h3>Deprecated</h3>
-      <p class="deprecated"><%= comm.deprecated %></p>
-      <% end %>
+		<% unless comm.nil? %>
+		<% unless comm.summary.nil? %>
+		
+		<h3>Summary</h3>
+		<p class="summary"><%= comm.summary %></p>
+		<% end %>
 
-      <% unless comm.nessus.nil? %>
-      <h3>Nessus Version</h3>
-      <p class="nessus"><%= comm.nessus %></p>
-      <% end %>
+		<% unless comm.description.empty? %>
+		<h3>Description</h3>
+			<% comm.description.each do |para| %>
+				<p class="description"><%= para %></p>
+			<% end %>
+		<% end %>
 
-      <% unless comm.categories.empty? %>
-      <h3>Categories</h3>
-      <ul>
-      <% comm.categories.sort.each do |cat| %>
-      <li><%= cat %></li>
-      <% end %>
-      </ul>
-      <% end %>
-      <% end %>
+		<% unless comm.remarks.empty? %>
+			<h3>Remarks</h3>
+				<% comm.remarks.each do |rem| %>
+					<p class="remark"><%= rem %></p>
+				<% end %>
+		<% end %>
 
-      <a href="#top">top</a>
-      <hr>
-      <% end %>
-      <% end %>
-      <% end %>
+		<% unless comm.deprecated.nil? %>
+			<h3>Deprecated</h3>
+			<p class="deprecated"><%= comm.deprecated %></p>
+		<% end %>
 
-      <% {Public: @funcs_pub, Private: @funcs_prv}.each do |name, list| %>
-      <% unless list.empty? %>
-      <h1><%= name %> Function Details</h1>
-      <% list.keys.sort.each do |name| %>
-      <h2 id="<%= name %>"><%= name %></h2>
-      <% comm = comment(name, :function) %>
+		<% unless comm.nessus.nil? %>
+			<h3>Nessus Version</h3>
+			<p class="nessus"><%= comm.nessus %></p>
+		<% end %>
 
-      <% unless comm.nil? %>
-      <% unless comm.summary.nil? %>
-      <h3>Summary</h3>
-      <p class="summary"><%= comm.summary %></p>
-      <% end %>
+		<% unless comm.categories.empty? %>
+			<h3>Categories</h3>
+			<ul>
+				<% comm.categories.sort.each do |cat| %>
+					<li><%= cat %></li>
+				<% end %>
+			</ul>
+			<% end %>
+		<% end %>
 
-      <% unless comm.description.empty? %>
-      <h3>Description</h3>
-      <% comm.description.each do |para| %>
-      <p class="description"><%= para %></p>
-      <% end %>
-      <% end %>
+		<a href="#top">top</a>
+		<hr>
+		<% end %>
+		<% end %>
+		<% end %>
 
-      <% unless comm.remarks.empty? %>
-      <h3>Remarks</h3>
-      <% comm.remarks.each do |rem| %>
-      <p class="remark"><%= rem %></p>
-      <% end %>
-      <% end %>
+		<% {Public: @funcs_pub, Private: @funcs_prv}.each do |name, list| %>
+		<% unless list.empty? %>
+		<h1><%= name %> Function Details</h1>
+		<% list.keys.sort.each do |name| %>
+		<h2 id="<%= name %>"><%= name %></h2>
+		<% comm = comment(name, :function) %>
 
-      <% unless comm.deprecated.nil? %>
-      <h3>Deprecated</h3>
-      <p class="deprecated"><%= comm.deprecated %></p>
-      <% end %>
+		<% unless comm.nil? %>
+		<% unless comm.summary.nil? %>
+		<h3>Summary</h3>
+		<p class="summary"><%= comm.summary %></p>
+		<% end %>
 
-      <% unless comm.nessus.nil? %>
-      <h3>Nessus Version</h3>
-      <p class="nessus"><%= comm.nessus %></p>
-      <% end %>
+		<% unless comm.description.empty? %>
+		<h3>Description</h3>
+		<% comm.description.each do |para| %>
+		<p class="description"><%= para %></p>
+		<% end %>
+		<% end %>
 
-      <% unless comm.categories.empty? %>
-      <h3>Categories</h3>
-      <ul>
-      <% comm.categories.sort.each do |cat| %>
-      <li><%= cat %></li>
-      <% end %>
-      </ul>
-      <% end %>
+		<% unless comm.remarks.empty? %>
+		<h3>Remarks</h3>
+		<% comm.remarks.each do |rem| %>
+		<p class="remark"><%= rem %></p>
+		<% end %>
+		<% end %>
 
-      <% unless comm.anonparams.empty? %>
-      <h3>Anonymous Parameters</h3>
-      <dl>
-      <% comm.anonparams.sort.each do |name, block| %>
-        <dt><%= name %></dt>
-        <dd><%= block %></dd>
-      <% end %>
-      </dl>
-      <% end %>
-      <% end %>
+		<% unless comm.deprecated.nil? %>
+		<h3>Deprecated</h3>
+		<p class="deprecated"><%= comm.deprecated %></p>
+		<% end %>
 
-      <% unless @functions[name].nil? || @functions[name].empty? %>
-      <h3>Named Parameters</h3>
-      <dl>
-      <% @functions[name].sort.each do |name| %>
-        <dt><%= name %></dt>
-        <% unless comm.nil? || !comm.params.has_key?(name) %>
-        <dd><%= comm.params[name] %></dd>
-        <% end %>
-      <% end %>
-      </dl>
-      <% end %>
+		<% unless comm.nessus.nil? %>
+		<h3>Nessus Version</h3>
+		<p class="nessus"><%= comm.nessus %></p>
+		<% end %>
 
-      <% unless comm.nil? || comm.return.nil? %>
-      <h3>Return Value</h3>
-      <p class="return"><%= comm.return %></p>
-      <% end %>
+		<% unless comm.categories.empty? %>
+		<h3>Categories</h3>
+		<ul>
+		<% comm.categories.sort.each do |cat| %>
+		<li><%= cat %></li>
+		<% end %>
+		</ul>
+		<% end %>
 
-      <a href="#top">top</a>
-      <hr>
-      <% end %>
-      <% end %>
-      <% end %>
-    </div>
+		<% unless comm.anonparams.empty? %>
+		<h3>Anonymous Parameters</h3>
+		<dl>
+		<% comm.anonparams.sort.each do |name, block| %>
+		  <dt><%= name %></dt>
+		  <dd><%= block %></dd>
+		<% end %>
+		</dl>
+		<% end %>
+		<% end %>
+
+		<% unless @functions[name].nil? || @functions[name].empty? %>
+		<h3>Named Parameters</h3>
+		<dl>
+		<% @functions[name].sort.each do |name| %>
+		  <dt><%= name %></dt>
+		  <% unless comm.nil? || !comm.params.has_key?(name) %>
+		  <dd><%= comm.params[name] %></dd>
+		  <% end %>
+		<% end %>
+		</dl>
+		<% end %>
+
+		<% unless comm.nil? || comm.return.nil? %>
+		<h3>Return Value</h3>
+		<p class="return"><%= comm.return %></p>
+		<% end %>
+
+		<a href="#top">top</a>
+		<hr>
+		<% end %>
+		<% end %>
+		<% end %>
+ 
+	</div><!--/span-->
+	</div><!--/row-->
+
+	<hr>
+
+	<footer>
+	<p>&copy; Company 2012</p>
+	</footer>
+
+  </div><!--/.fluid-container-->
+
+  <!-- Le javascript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="assets/js/jquery.js"></script>
+  <script src="assets/js/bootstrap-transition.js"></script>
+  <script src="assets/js/bootstrap-alert.js"></script>
+  <script src="assets/js/bootstrap-modal.js"></script>
+  <script src="assets/js/bootstrap-dropdown.js"></script>
+  <script src="assets/js/bootstrap-scrollspy.js"></script>
+  <script src="assets/js/bootstrap-tab.js"></script>
+  <script src="assets/js/bootstrap-tooltip.js"></script>
+  <script src="assets/js/bootstrap-popover.js"></script>
+  <script src="assets/js/bootstrap-button.js"></script>
+  <script src="assets/js/bootstrap-collapse.js"></script>
+  <script src="assets/js/bootstrap-carousel.js"></script>
+  <script src="assets/js/bootstrap-typeahead.js"></script>
+
   </body>
 </html>
