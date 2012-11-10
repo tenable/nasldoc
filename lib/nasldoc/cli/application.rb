@@ -149,10 +149,18 @@ module NaslDoc
 
 			# Copies required assets to the final build directory
 			def copy_assets
-				puts "[*] Copying stylesheet.css to output dir"
-				`cp #{@asset_dir}/stylesheet.css #{@options[:output_directory]}`
-				puts "[*] Copying nessus.jpg to output dir"
-				`cp #{@asset_dir}/nessus.jpg #{@options[:output_directory]}`
+				puts `cp -vr #{@asset_dir} #{@options[:output_directory]}/` 
+				#puts "[*] Copying stylesheet.css to output dir"
+				# `cp #{@asset_dir}/css/stylesheet.css #{@options[:output_directory]}`
+				#puts "[*] Copying bootstrap.css to output dir"
+				# `cp #{@asset_dir}/css/bootstrap.css #{@options[:output_directory]}`
+				#puts "[*] Copying nessus.jpg to output dir"
+				# `cp #{@asset_dir}/img/nessus.jpg #{@options[:output_directory]}`
+				#puts "[*] Copy bootstrap.js to output dir"
+				# `cp #{@asset_dir}/js/bootstrap.js #{@options[:output_directory]}`
+				#puts "[*] Copy jquery.js to output dir"
+				#`cp #{@asset_dir}/js/jquery-1.8.2.js #{@options[:output_directory]}`
+
 			end
 
 			# Prints documentation stats to stdout
@@ -253,8 +261,8 @@ module NaslDoc
 				puts "[*] Building documentation..."
 
 				build_template "index"
-				build_template "sidebar"
-				build_template "overview"
+				#build_template "sidebar"
+				#build_template "overview"
 
 				build_file_pages
 				copy_assets
