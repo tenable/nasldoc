@@ -205,12 +205,13 @@ module NaslDoc
 			# Parses the command line arguments
 			def parse_args
 				opts = OptionParser.new do |opt|
-					opt.banner =	"#{APP_NAME} v#{VERSION}\nTenable Network Security.\njhammack@tenable.com\n\n"
+					opt.banner = "#{APP_NAME} v#{VERSION}\nTenable Network Security.\njhammack@tenable.com\n\n"
 					opt.banner << "Usage: #{APP_NAME} [options] [file|directory]"
-					opt.separator('')
-					opt.separator("Options")
 
-					opt.on('-o','--output DIRECTORY','Directory to output results to, Created if it doesn\'t exist') do |option|
+					opt.separator ''
+					opt.separator 'Options'
+
+					opt.on('-o', '--output DIRECTORY', "Directory to output results to, created if it doesn't exit") do |option|
 						@options[:output_directory] = option
 					end
 
