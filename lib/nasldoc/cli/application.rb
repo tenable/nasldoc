@@ -5,13 +5,13 @@
 # modification, are permitted provided that the following conditions are met:
 #
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#	notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
-#       documentation and/or other materials provided with the distribution.
+#	notice, this list of conditions and the following disclaimer in the
+#	documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Tenable Network Security nor the names of its contributors
-#     	may be used to endorse or promote products derived from this software
-#     	without specific prior written permission.
+#	may be used to endorse or promote products derived from this software
+#	without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -32,7 +32,7 @@ module NaslDoc
 			attr_accessor :error_count
 
 			# Initializes the Application class
-			# 
+			#
 			# - Sets the default output directory to nasldoc_output/
 			# - Sets the template directory to lib/templates
 			# - Sets the assets directory to lib/assets
@@ -149,14 +149,14 @@ module NaslDoc
 
 			# Builds each page from the file_list
 			def build_file_pages
-				@file_list.each do |f| 
-					build_file_page(f) 
+				@file_list.each do |f|
+					build_file_page(f)
 				end
 			end
 
 			# Copies required assets to the final build directory
 			def copy_assets
-				puts `cp -vr #{@asset_dir} #{@options[:output_directory]}/` 
+				puts `cp -vr #{@asset_dir} #{@options[:output_directory]}/`
 				#puts "[*] Copying stylesheet.css to output dir"
 				# `cp #{@asset_dir}/css/stylesheet.css #{@options[:output_directory]}`
 				#puts "[*] Copying bootstrap.css to output dir"
