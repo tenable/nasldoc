@@ -241,7 +241,7 @@ module NaslDoc
 				parse_args
 
 				if File.directory?(ARGV.first) == true
-					pattern = File.join(ARGV.first, "*.inc")
+					pattern = File.join(ARGV.first, '**', '*.inc')
 					@file_list = Dir.glob pattern
 				else
 					@file_list << ARGV.first
