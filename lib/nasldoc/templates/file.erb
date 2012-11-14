@@ -86,7 +86,7 @@
 	<div class="span3">
 	  <div class="well sidebar-nav">
 	  <ul class="nav nav-list">
-		<% @file_list.sort.each_with_index do |file, i| %>
+		<% @file_list.each_with_index do |file, i| %>
 			<% row = i.even? ? 'even' : 'odd' %>
 			<% link = url(file) %>
 			<li class="<%= row %>">
@@ -133,7 +133,7 @@
 		<h1>Automatic Includes</h1>
 		<p>These files are automatically included by the library.</p>
 		<ul>
-		  <% @includes.sort.each do |inc| %>
+		  <% @includes.each do |inc| %>
 		  <li><a href="<%= url(inc) %>"><%= inc %></a></li>
 		  <% end %>
 		</ul>
@@ -159,7 +159,7 @@
 			<th>Name</th>
 			<th>Summary</th>
 		  </tr>
-		  <% list.sort.each do |name| %>
+		  <% list.each do |name| %>
 		  <tr>
 			<td><a href="#<%= name %>"><%= name %></a></td>
 			<td><%= safe(comment(name, :global), "", :summary) %></td>
@@ -201,7 +201,7 @@
 		<% {Public: @globs_pub, Private: @globs_prv}.each do |name, list| %>
 		<% unless list.empty? %>
 		<h1><%= name %> Variable Details</h1>
-		<% list.sort.each do |name| %>
+		<% list.each do |name| %>
 		<h2 id="<%= name %>"><%= name %></h2>
 		<% comm = comment(name, :global) %>
 

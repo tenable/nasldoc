@@ -63,18 +63,25 @@ module NaslDoc
 				binding
 			end
 
-			# Generates a HTML base name for a path
+			# Generates the base name for a path
+			#
+			# @return htmlized file name for .inc file
+			def base path
+				File.basename(path, '.inc')
+			end
+
+			# Generates the HTML base name for a path
 			#
 			# @return htmlized file name for .inc file
 			def url path
-				File.basename(path).gsub('.', '_').sub(/_inc$/, '.html')
+				base(path).gsub('.', '_') + '.html'
 			end
 
 			# Compiles a template for each file
 			def build_template name, path=nil
 				path ||= name
 
-				dest = File.basename(path).gsub(".", "_").sub(/_inc$/, "") + ".html"
+				dest = url(path)
 				puts "[**] Creating #{dest}"
 				@erb = ERB.new File.new("#{@template_dir}/#{name}.erb").read, nil, "%"
 				html = @erb.result(get_binding)
@@ -257,7 +264,9 @@ module NaslDoc
 				@file_list = remove_blacklist(@file_list)
 
 				# Ensure we process files in a consistent order.
-				@file_list.sort!
+				@file_list.sort! do |a, b|
+					base(a) <=> base(b)
+				end
 
 				puts "[*] Building documentation..."
 

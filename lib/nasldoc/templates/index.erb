@@ -58,7 +58,7 @@
 				<div class="span3">
 					<div class="well sidebar-nav">
 						<ul class="nav nav-list">
-							<% @file_list.sort.each_with_index do |file, i| %>
+							<% @file_list.each_with_index do |file, i| %>
 								<% row = i.even? ? 'even' : 'odd' %>
 								<% link = url(file) %>
 								<li class="<%= row %>">
