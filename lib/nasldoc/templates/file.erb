@@ -108,7 +108,7 @@
 		<p class="description"><%= paragraph %></p>
 		<% end %>
 
-		<% if @overview.signed %>	
+		<% if @overview.signed %>
 			<h1>Signed</h1>
 			<p>This library contains a signature, indicating that it is permitted to
 			call trusted builtin functions.</p>
@@ -117,7 +117,7 @@
 		<% end %>
 
 		<% unless @overview.includes.empty? %>
-		
+
 		<h1>Required Includes</h1>
 		<p>These files must be included by the importing code.</p>
 		<ul>
@@ -129,7 +129,7 @@
 		<% end %>
 
 		<% unless @includes.empty? %>
-		
+
 		<h1>Automatic Includes</h1>
 		<p>These files are automatically included by the library.</p>
 		<ul>
@@ -141,7 +141,7 @@
 
 		<% {Public: @globs_pub, Private: @globs_prv}.each do |name, list| %>
 		<% unless list.empty? %>
-		
+
 		<h1><%= name %> Variable Summary</h1>
 
 		<% if name == :Public %>
@@ -207,7 +207,7 @@
 
 		<% unless comm.nil? %>
 		<% unless comm.summary.nil? %>
-		
+
 		<h3>Summary</h3>
 		<p class="summary"><%= comm.summary %></p>
 		<% end %>
@@ -331,7 +331,7 @@
 		<% end %>
 		<% end %>
 		<% end %>
- 
+
 	</div><!--/span-->
 	</div><!--/row-->
 
