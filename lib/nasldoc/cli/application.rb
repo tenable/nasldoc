@@ -103,7 +103,10 @@ module NaslDoc
 				# Collect the functions.
 				@functions = Hash.new()
 				tree.all(:Function).map do |fn|
-					@functions[fn.name.name] = fn.params.map(&:name)
+					@functions[fn.name.name] = {
+						:code => fn.context(nil, false, false),
+						:params => fn.params.map(&:name)
+					}
 					@function_count += 1
 				end
 
