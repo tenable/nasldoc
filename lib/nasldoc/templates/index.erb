@@ -62,7 +62,7 @@
 								<% row = i.even? ? 'even' : 'odd' %>
 								<% link = url(file) %>
 								<li class="<%= row %>">
-									<a href="<%= link %>" target="content"><%= link.gsub('.html', '.inc') %></a>
+									<a href="<%= link %>"><%= link.gsub('.html', '.inc') %></a>
 								</li>
 							<% end %>
 						</ul>
