@@ -1,8 +1,18 @@
 # News
 
+#0.1.1 (January 29, 2013) 
+- Fixed bug caused by target attribute in anchor tags (Mak)
+- Fixed linkages, these files don't exist, they're minified (Mak)
+- Add syntax highlighting (Mak)
+- Add source code to function hash (Mak)
+- Fixed whitespace and removed trailing whitespace (Mak)
+- Fixed parsing bug caused by bad formatting of tags (Mak)
+- Fixed sorting for directories. (Mak)
+- Fixed minor inconsistencies. (Mak)
+- Support nested directories. (Mak)
+
 #0.1.0 (November 2012)
 - Integrated the nasl gem's language parsing for acquiring comments (Mak)
-- Added 
 
 #0.0.9 (March 2012)
 - Fixed a show stopper
