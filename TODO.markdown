@@ -1,7 +1,7 @@
 # Todo
 - create a github page for the project
 
-
+- hyper links open in new tab in firefox
 - fix the formatting for the function summaries
 - [hyperlink] syntax is broken
 - fix size of style for each item
@@ -18,3 +18,5 @@
 
 - TemplateHelper
 	- 
+
+- Anchor tags css issue not seeing the top
