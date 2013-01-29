@@ -1,4 +1,4 @@
-# Copyright (c) 2011-2012 Tenable Network Security.
+# Copyright (c) 2011-2013 Tenable Network Security.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -231,7 +231,7 @@ module NaslDoc
 				if ARGV.length != 0
 					opts.parse!
 				else
-					puts opts.to_s + '\n'
+					puts opts.to_s + "\n"
 					exit
 				end
 			end
