@@ -1,8 +1,13 @@
 # News
 
+#0.1.2 (November 2013)
+- Updated Copyrights
+
+#0.1.1 (January 2013)
+- Added new default bootstrap based template
+
 #0.1.0 (November 2012)
 - Integrated the nasl gem's language parsing for acquiring comments (Mak)
-- Added 
 
 #0.0.9 (March 2012)
 - Fixed a show stopper
