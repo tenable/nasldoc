@@ -314,10 +314,10 @@
 		<% unless @functions[name].nil? || @functions[name].empty? %>
 		<h3>Named Parameters</h3>
 		<dl>
-		<% @functions[name][:params].sort.each do |name| %>
-		  <dt><%= name %></dt>
-		  <% unless comm.nil? || !comm.params.has_key?(name) %>
-		  <dd><%= comm.params[name] %></dd>
+		<% @functions[name][:params].sort.each do |param| %>
+		  <dt><%= param.name %></dt>
+		  <% unless comm.nil? || !comm.params.has_key?(param.name) %>
+		  <dd><%= comm.params[param.name] %></dd>
 		  <% end %>
 		<% end %>
 		</dl>
