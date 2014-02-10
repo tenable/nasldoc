@@ -183,8 +183,18 @@ module NaslDoc
 					"daily_badurl.inc",
 					"known_CA.inc",
 					"oui.inc",
+					"oval-definitions-schematron.inc",
+					"ovaldi32-rhel5.inc",
+					"ovaldi32-win-dyn-v100.inc",
+					"ovaldi32-win-dyn-v90.inc",
+					"ovaldi32-win-static.inc",
+					"ovaldi64-rhel5.inc",
+					"ovaldi64-win-dyn-v100.inc",
+					"ovaldi64-win-dyn-v90.inc",
+					"ovaldi64-win-static.inc",
 					"plugin_feed_info.inc",
 					"sc_families.inc",
+					"scap_schema.inc",
 					"ssl_known_cert.inc"
 				]
 
