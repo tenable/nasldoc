@@ -50,5 +50,5 @@ Gem::Specification.new do |s|
 	s.required_rubygems_version		= ">= 1.8.24"
 	s.rubyforge_project			= "#{NaslDoc::APP_NAME}"
 
-	s.add_dependency('nasl', ['>= 0.0.8'])
+	s.add_dependency('nasl', ['>= 0.1.0'])
 end

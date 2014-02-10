@@ -114,7 +114,13 @@ module NaslDoc
 				@funcs_pub = @functions.reject { |n, p| @funcs_prv.key? n }
 
 				# Collect the globals.
-				@globals = tree.all(:Global).map(&:idents).flatten.map(&:name).sort
+				@globals = tree.all(:Global).map(&:idents).flatten.map do |id|
+					if id.is_a? Nasl::Assignment
+						id.lval.name
+					else
+						id.name
+					end
+				end.sort
 
 				@globs_prv = @globals.select { |n| n =~ /^_/ }
 				@globs_pub = @globals.reject { |n| @globs_prv.include? n }
