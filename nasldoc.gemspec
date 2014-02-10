@@ -30,25 +30,25 @@ require 'rubygems'
 require 'nasldoc'
 
 Gem::Specification.new do |s|
-	s.name							= "#{NaslDoc::APP_NAME}"
-	s.version						= NaslDoc::VERSION
-	s.homepage						= "http://github.com/tenable/nasldoc"
-	s.summary						= "#{NaslDoc::APP_NAME}"
-	s.description					= "#{NaslDoc::APP_NAME} is a NASL documentation generator"
-	s.license						= "BSD"
+	s.name					= "#{NaslDoc::APP_NAME}"
+	s.version				= NaslDoc::VERSION
+	s.homepage				= "http://github.com/tenable/nasldoc"
+	s.summary				= "#{NaslDoc::APP_NAME}"
+	s.description				= "#{NaslDoc::APP_NAME} is a NASL documentation generator"
+	s.license				= "BSD"
 
-	s.author						= "Jacob Hammack"
-	s.email							= "jhammack@tenable.com"
+	s.author				= "Jacob Hammack"
+	s.email					= "jhammack@tenable.com"
 
-	s.files							= Dir['[A-Z]*'] + Dir['lib/**/*'] + ["#{NaslDoc::APP_NAME}.gemspec"]
-	s.bindir						= "bin"
-	s.executables					= "#{NaslDoc::APP_NAME}"
-	s.require_paths					= ["lib"]
-	s.has_rdoc						= 'yard'
-	s.extra_rdoc_files				= ["README.markdown", "NEWS.markdown", "TODO.markdown"]
+	s.files					= Dir['[A-Z]*'] + Dir['lib/**/*'] + ["#{NaslDoc::APP_NAME}.gemspec"]
+	s.bindir				= "bin"
+	s.executables				= "#{NaslDoc::APP_NAME}"
+	s.require_paths				= ["lib"]
+	s.has_rdoc				= 'yard'
+	s.extra_rdoc_files			= ["README.markdown", "NEWS.markdown", "TODO.markdown"]
 
 	s.required_rubygems_version		= ">= 1.8.24"
-	s.rubyforge_project				= "#{NaslDoc::APP_NAME}"
+	s.rubyforge_project			= "#{NaslDoc::APP_NAME}"
 
 	s.add_dependency('nasl', ['>= 0.0.8'])
 end
