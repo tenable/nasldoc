@@ -1,5 +1,8 @@
 # News
 
+#0.2.0 (February 10, 2014)
+- Updated to support NASL v5.2. (Mak)
+
 #0.1.1 (January 29, 2013) 
 - Fixed bug caused by target attribute in anchor tags (Mak)
 - Fixed linkages, these files don't exist, they're minified (Mak)
