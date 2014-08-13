@@ -173,6 +173,7 @@ module NaslDoc
 			# Removes blacklisted files from the file list
 			def remove_blacklist file_list
 				blacklist = [
+					"apple_device_model_list.inc",
 					"blacklist_dss.inc",
 					"blacklist_rsa.inc",
 					"blacklist_ssl_rsa1024.inc",
