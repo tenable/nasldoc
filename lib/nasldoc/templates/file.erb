@@ -316,9 +316,9 @@
 		<dl>
 
 		<% @functions[name][:params].sort.each do |param| %>
-			<dt><%= param %></dt>
-			<% unless comm.nil? || !comm.params.has_key?(param) %>
-			<dd><%= comm.params[param] %></dd>
+			<dt><%= param.name %></dt>
+			<% unless comm.nil? || !comm.params.has_key?(param.name) %>
+			<dd><%= comm.params[param.name] %></dd>
 		  <% end %>
 		<% end %>
 		</dl>
