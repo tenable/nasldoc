@@ -314,10 +314,11 @@
 		<% unless @functions[name].nil? || @functions[name].empty? %>
 		<h3>Named Parameters</h3>
 		<dl>
+
 		<% @functions[name][:params].sort.each do |param| %>
-		  <dt><%= param.name %></dt>
-		  <% unless comm.nil? || !comm.params.has_key?(param.name) %>
-		  <dd><%= comm.params[param.name] %></dd>
+			<dt><%= param %></dt>
+			<% unless comm.nil? || !comm.params.has_key?(param) %>
+			<dd><%= comm.params[param] %></dd>
 		  <% end %>
 		<% end %>
 		</dl>
@@ -331,7 +332,7 @@
 		<h3>Code</h3>
                 <!-- The contents must not have indentation, else formatting is off. -->
 		<pre class="brush: nasl">
-<%= @functions[name][:code] %>
+<%= CGI::escapeHTML(@functions[name][:code]) %>
 		</pre>
 		<a href="#top">top</a>
 		<hr>
