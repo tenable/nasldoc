@@ -32,5 +32,6 @@ end
 require 'erb'
 require 'pathname'
 require 'optparse'
+require 'rainbow/ext/string'
 
 require 'nasldoc/cli'
