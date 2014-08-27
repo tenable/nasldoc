@@ -50,6 +50,8 @@ Gem::Specification.new do |s|
 	s.required_rubygems_version		= ">= 1.8.24"
 	s.rubyforge_project				= "#{NaslDoc::APP_NAME}"
 
+	s.add_development_dependency 'rake', '~>10.1'
+
 	s.add_dependency('nasl', ['>= 0.1.1'])
 	s.add_dependency('rainbow', ['>= 2.0.0'])
 end
