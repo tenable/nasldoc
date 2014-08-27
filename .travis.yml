@@ -15,4 +15,3 @@ notifications:
 
 before_install:
   - gem --version
-

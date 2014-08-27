@@ -1,7 +1,7 @@
 # News
 
-#0.2.0 (February 10, 2014)
-- Updated to support NASL v5.2. (Mak)
+#0.2.0 (August 27, 2014)
+- Updated to support NASL v5.2.
 - Minor bug fixes
 
 #0.1.1 (January 29, 2013) 
