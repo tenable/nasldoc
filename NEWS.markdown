@@ -3,6 +3,7 @@
 #0.2.0 (August 27, 2014)
 - Updated to support NASL v5.2.
 - Minor bug fixes
+- Added travis.ci support
 
 #0.1.1 (January 29, 2013) 
 - Fixed bug caused by target attribute in anchor tags (Mak)
