@@ -98,7 +98,12 @@ module NaslDoc
 				contents = File.open(path, "rb") { |f| f.read }
 
 				# Parse the input file.
-				tree = Nasl::Parser.new.parse(contents, path)
+				begin
+					tree = Nasl::Parser.new.parse(contents, path)
+				rescue Nasl::ParseException, Nasl::TokenException
+					puts "[!!!] File '#{path}' couldn't be parsed. It should be added to the blacklist."
+					return nil
+				end
 
 				# Collect the functions.
 				@functions = Hash.new()
