@@ -51,6 +51,12 @@ module NaslDoc
 
 				@overview = nil
 
+				@fn_ns_map = {}
+				@obj_ns_map = {}
+				@obj_fn_map = {}
+
+				@namespaces = []
+
 				@template_dir = Pathname.new(__FILE__).realpath.to_s.gsub('cli/application.rb', 'templates')
 				@asset_dir = Pathname.new(__FILE__).realpath.to_s.gsub('cli/application.rb', 'assets')
 				@current_file = "(unknown)"
@@ -75,6 +81,31 @@ module NaslDoc
 			# @return htmlized file name for .inc file
 			def url path
 				base(path).gsub('.', '_') + '.html'
+			end
+
+			# Generates namespace mappings
+			def build_namespace_map(tree, namespaces, fn_map, obj_map, obj_fn_map, level=0, prefix = nil, object = nil)
+				cur_namespace = prefix
+				for node in tree do
+					if(node.class.to_s == "Nasl::Namespace")
+						if(level == 0)
+							namespaces << node.name.name
+							build_namespace_map(node, namespaces, fn_map, obj_map, obj_fn_map, level + 1, node.name.name)
+						else
+							ns = prefix + '::' + node.name.name
+							namespaces << ns
+							build_namespace_map(node, namespaces, fn_map, obj_map, obj_fn_map, level + 1, ns)
+						end
+					elsif(node.class.to_s == "Nasl::Function")
+						fn_map[node.to_s] = cur_namespace
+						if(!object.nil?)
+							obj_fn_map[node.to_s] = object 
+						end
+					elsif(node.class.to_s == "Nasl::Object")
+						obj_map[node.to_s] = cur_namespace
+						build_namespace_map(node, namespaces, fn_map, obj_map, obj_fn_map, level + 1, cur_namespace, node.name.name)
+					end
+				end
 			end
 
 			# Compiles a template for each file
@@ -105,18 +136,55 @@ module NaslDoc
 					return nil
 				end
 
+				# get namespace mapping
+				build_namespace_map(tree, @namespaces, @fn_ns_map, @obj_ns_map, @obj_fn_map)
+				
 				# Collect the functions.
 				@functions = Hash.new()
 				tree.all(:Function).map do |fn|
-					@functions[fn.name.name] = {
-						:code => fn.context(nil, false, false),
-						:params => fn.params.map(&:name)
+					ns = @fn_ns_map[fn.to_s]
+					show_ns = 0
+					if(fn.fn_type == "normal" and !ns.nil?)
+						show_ns = 1
+					end
+					code_snip = fn.context(nil, false, false)
+					if (!code_snip.nil?)
+						code_snip = code_snip.gsub(/#*$/, "").rstrip
+					end
+					@functions[fn.to_s] = {
+						:name => fn.name.name,
+						:code => code_snip,
+						:params => fn.params.map(&:name),
+						:namespace => ns,
+						:fn_type => fn.fn_type,
+						:show_ns => show_ns,
+						:object => @obj_fn_map[fn.to_s]
 					}
 					@function_count += 1
 				end
 
-				@funcs_prv = @functions.select { |n, p| n =~ /^_/ }
-				@funcs_pub = @functions.reject { |n, p| @funcs_prv.key? n }
+				@funcs_prv = {}
+				@funcs_pub = {}
+
+				for function in tree.all(:Function) do
+					if (defined? function.tokens[0].type and function.tokens[0].type == :PUBLIC)
+						@funcs_pub[function.to_s] = @functions[function.to_s]
+					elsif (defined? function.tokens[0].type and function.tokens[0].type == :PRIVATE)
+						@funcs_prv[function.to_s] = @functions[function.to_s]
+					elsif (function.fn_type == 'obj' and defined? function.tokens[0].type and function.tokens[0].type.nil?)
+						if(obj_fn_map[function.to_s] == function.name.name) # handle constructor
+							@funcs_pub[function.to_s] = @functions[function.to_s]
+						else
+							@funcs_prv[function.to_s] = @functions[function.to_s]
+						end
+					elsif (function.name.name =~ /^_/)
+						@funcs_prv[function.to_s] = @functions[function.to_s]
+					else
+						@funcs_pub[function.to_s] = @functions[function.to_s]
+					end
+				end
+#				@funcs_prv = @functions.select { |n, p| n =~ /^_/ }
+#				@funcs_pub = @functions.reject { |n, p| @funcs_prv.key? n }
 
 				# Collect the globals.
 				@globals = tree.all(:Global).map(&:idents).flatten.map do |id|
