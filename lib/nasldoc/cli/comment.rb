@@ -240,6 +240,7 @@ module NaslDoc
 									raise TagFormatException, "Failed to parse the #{tag}'s block for #@name."
 								end
 								block.lstrip!
+								block = block.gsub(/^.*>/, "")
 
 								# Check for previous declarations of this name.
 								if @anonparams.key?(name)
@@ -252,6 +253,7 @@ module NaslDoc
 
 								hash = self.send(attr + 's')
 								hash[name] = block
+
 							when '@category'
 								unless @categories.empty?
 									raise DuplicateTagException, "The #{tag} tag appears more than once for #@name."
@@ -296,7 +298,8 @@ module NaslDoc
 			def extract_function(node)
 				# Remember the function name.
 				fn = node.next
-				@function = fn.name.name
+				@function = fn.to_s
+				@fn_type = fn.fn_type
 
 				# Name this comment for use in error messages.
 				@name = "function #@function"

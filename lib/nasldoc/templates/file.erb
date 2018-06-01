@@ -26,6 +26,34 @@
   end
 %>
 
+<%
+  def build_fn_name(name, colorize = 0)
+    fn_str = ''
+    if (!@functions[name][:namespace].nil?)
+      if(colorize)
+	fn_str += "<font color='#770877'>" + @functions[name][:namespace] + "</font><b>::</b>"
+      else
+      	fn_str += @functions[name][:namespace] + "::"
+      end
+    end
+    if (!@functions[name][:object].nil?)
+      if(colorize)
+        fn_str += "<font color='#B83E0D'>" + @functions[name][:object] + "</font><b>.</b>"
+      else
+        fn_str += @functions[name][:object] + "."
+      end
+    end
+    if(colorize)
+        color = "#50A40B"
+	color = "#086E6E" if @functions[name][:fn_type] == "obj"
+        fn_str += "<font color='#" + color + "'><b>" + @functions[name][:name] + "()</b></font>"
+    else
+      fn_str += @functions[name][:name]
+    end
+    fn_str
+  end
+%>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -161,9 +189,9 @@
 			<th>Name</th>
 			<th>Summary</th>
 		  </tr>
-		  <% list.each do |name| %>
+                  <% list.each do |name| %>
 		  <tr>
-			<td><a href="#<%= name %>"><%= name %></a></td>
+			<td><a href="#<% name %>"><%= name %></a></td>
 			<td><%= safe(comment(name, :global), "", :summary) %></td>
 		  </tr>
 		  <% end %>
@@ -190,9 +218,11 @@
 			<th>Name</th>
 			<th>Summary</th>
 		  </tr>
-		  <% list.keys.sort.each do |name| %>
+		  <% list.keys.sort_by { |key| [@functions[key][:name]] }.each do |name| %>
 		  <tr>
-			<td><a href="#<%= name %>"><%= name %></a></td>
+			<td><a href="#<%= build_fn_name(name) %>">
+			<%= build_fn_name(name, 1) %>
+			</a></td>
 			<td><%= safe(comment(name, :function), "", :summary) %></td>
 		  </tr>
 		  <% end %>
@@ -258,7 +288,7 @@
 		<% unless list.empty? %>
 		<h1><%= name %> Function Details</h1>
 		<% list.keys.sort.each do |name| %>
-		<h2 id="<%= name %>"><%= name %></h2>
+		<h2 id="<%= build_fn_name(name) %>"><%= @functions[name][:name] %></h2>
 		<% comm = comment(name, :function) %>
 
 		<% unless comm.nil? %>
@@ -267,6 +297,16 @@
 		<p class="summary"><%= comm.summary %></p>
 		<% end %>
 
+		<% unless @functions[name][:namespace].nil? %>
+		<h3>Namespace</h3>
+                <p class="namespace"><%= @functions[name][:namespace] %></p>
+		<% end %>
+
+		<% unless @functions[name][:object].nil? %>
+		<h3>Object</h3>
+                <p class="object"><%= @functions[name][:object] %></p>
+		<% end %>
+		
 		<% unless comm.description.empty? %>
 		<h3>Description</h3>
 		<% comm.description.each do |para| %>
@@ -332,7 +372,9 @@
 		<h3>Code</h3>
                 <!-- The contents must not have indentation, else formatting is off. -->
 		<pre class="brush: nasl">
+<% unless @functions[name][:code].nil? %>
 <%= CGI::escapeHTML(@functions[name][:code]) %>
+<% end %>
 		</pre>
 		<a href="#top">top</a>
 		<hr>
@@ -346,7 +388,7 @@
 	<hr>
 
 	<footer>
-		<p>&copy; Tenable Network Security 2014</p>
+		<p>&copy; Tenable Network Security 2018</p>
 	</footer>
 
   </div><!--/.fluid-container-->
