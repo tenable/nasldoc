@@ -26,7 +26,7 @@
 
 module NaslDoc
 	APP_NAME = "nasldoc"
-	VERSION = "0.3.0"
+	VERSION = "0.3.1"
 end
 
 require 'erb'
