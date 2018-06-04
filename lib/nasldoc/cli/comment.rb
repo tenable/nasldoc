@@ -142,6 +142,8 @@ module NaslDoc
 				re_sig = Regexp.new(trusted_regex)
 				text.gsub!(re_sig, '');
 
+				# strip out empty comment lines with accidental whitespace afterwards
+				text.gsub!(/^#+[ \t]+$/, '');
 				# Remove the comment prefixes ('#') from the text.
 				text.gsub!(/^#+/, '');
 
@@ -302,7 +304,7 @@ module NaslDoc
 				@fn_type = fn.fn_type
 
 				# Name this comment for use in error messages.
-				@name = "function #@function"
+				@name = "function " + fn.name.name
 
 				# Add in all named parameters, even ones that weren't annotated.
 				fn.params.each { |arg| @params[arg.name] = nil }
