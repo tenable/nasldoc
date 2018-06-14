@@ -371,11 +371,11 @@
 
 		<h3>Code</h3>
                 <!-- The contents must not have indentation, else formatting is off. -->
-		<pre class="brush: nasl">
+<script type="syntaxhighlighter" class="brush: nasl"><![CDATA[ 
 <% unless @functions[name][:code].nil? %>
-<%= CGI::escapeHTML(@functions[name][:code]) %>
+<%= @functions[name][:code] %>
 <% end %>
-		</pre>
+]]></script>
 		<a href="#top">top</a>
 		<hr>
 		<% end %>
@@ -388,7 +388,7 @@
 	<hr>
 
 	<footer>
-		<p>&copy; Tenable Network Security 2018</p>
+		<p>&copy; Tenable Network Security <%= Time.new.year %></p>
 	</footer>
 
   </div><!--/.fluid-container-->
