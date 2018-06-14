@@ -253,29 +253,25 @@ module NaslDoc
 			def remove_blacklist file_list
 				blacklist = [
 					"apple_device_model_list.inc",
-					"blacklist_dss.inc",
-					"blacklist_rsa.inc",
-					"blacklist_ssl_rsa1024.inc",
-					"blacklist_ssl_rsa2048.inc",
+					"blacklist_",
 					"custom_CA.inc",
-					"daily_badip.inc",
-					"daily_badip2.inc",
+					"daily_badip",
 					"daily_badurl.inc",
 					"known_CA.inc",
 					"oui.inc",
 					"oval-definitions-schematron.inc",
-					"ovaldi32-rhel5.inc",
-					"ovaldi32-win-dyn-v100.inc",
-					"ovaldi32-win-dyn-v90.inc",
-					"ovaldi32-win-static.inc",
-					"ovaldi64-rhel5.inc",
-					"ovaldi64-win-dyn-v100.inc",
-					"ovaldi64-win-dyn-v90.inc",
-					"ovaldi64-win-static.inc",
 					"plugin_feed_info.inc",
 					"sc_families.inc",
 					"scap_schema.inc",
-					"ssl_known_cert.inc"
+					"ssl_known_cert.inc",
+                                        "ssh_get_info2",
+                                        "torture_cgi",
+                                        "daily_badip3.inc",
+                                        "cisco_ios.inc",
+					"ovaldi32",
+					"ovaldi64",
+					"os_cves.inc",
+                                        "kernel_cves.inc"
 				]
 
 				new_file_list = file_list.dup
