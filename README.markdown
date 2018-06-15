@@ -1,20 +1,20 @@
-#nasldoc
+# nasldoc
 
-#Installation
+### Installation
 
 Installation is really easy, all you need to do is gem install!
 
-	% gem install nasldoc
+        % gem install nasldoc
 
-#Usage
+#### Usage
 
 Using `nasldoc` is fairly simple; just pass it a directory or a single file that you want to generate the documentation for. `nasldoc` is designed to only parse .inc files which special comment markup.
 
-	% nasldoc /opt/nessus/lib/nessus/plugins/
+        % nasldoc /opt/nessus/lib/nessus/plugins/
 
 This will cause a directory called `nasldoc/` to be created in your current directory. This directory will contain all of the generated HTML documents. After running `nasldoc`, open `index.html` inside of `nasldoc/` and view the documentation.
 
-#Comment Markup
+#### Comment Markup
 
 `nasldoc` comments are inclosed in ## blocks and use special tags to mark items. Currently, there are only 3 tags. Tags can be added in a matter of minutes to the parser.
 
@@ -28,48 +28,67 @@ nasldoc supports several markup tags:
 - @category - type of category for the function
 - @remark - special notes or remarks
 
-#Function Description Block
+### Function Description Block
 
 The function description block is free form text from the first ## block to the first @tag in the `nasldoc` body. The lines are split on the # and rejoined with spaces.
 
-#Example
+Example:
 
-	## 
-	# An example addition function in NASL
-	#
-	# @param arg1 first number to add
-	# @param arg2 second number to add
-	#
-	# @return the sum of arg1 and arg2
-	##
-	function add(arg1, arg2)
-	{
-	  return (arg1 + arg2);
-	}
+        ##
+        # An example addition function in NASL
+        #
+        # @param arg1 first number to add
+        # @param arg2 second number to add
+        #
+        # @return the sum of arg1 and arg2
+        ##
+        function add(arg1, arg2)
+        {
+          return (arg1 + arg2);
+        }
 
-#Templates
+### Variable types
+
+If you'd like, you can provide variable type descriptions.  The syntax is as follows:
+
+        ##
+        # An example addition function in NASL
+        #
+        # @param <arg1:int> first number to add
+        # @param [arg2:int] second number to add
+        #
+        # @return the sum of arg1 and arg2
+        ##
+        function add(arg1, arg2)
+        {
+          return (arg1 + arg2);
+        }
+
+You can wrap the name:type tuple using either '[]' or '<>'.
+
+### Templates
 
 `nasldoc` uses the ERB templating engine to make generating the output HTML trivial. Attached is an example of the sidebar; ruby code can be injected to help generate the layout.
 
-##Example
+Example:
 
-	<html>
-		<head>
-			<title>nasldoc</title>
-			<link rel = 'stylesheet' type= 'text/css' href='stylesheet.css'>
-		</head>
-		<body>
-			<img src='nessus.jpg' />
-			<br><br><br>
-			<ul>
-				<% @file_list.each_with_index do |file, i| %>
-					<% row_class = i % 2 == 0 ? "even" : "odd" %> 
-					<% output_file = file.gsub(".", "_") %>
-					<% output_file = File.basename(file).gsub(".", "_") %>
-					<li class="<%= row_class %>"><a href='<%= output_file %>.html' target='content'><%= File.basename(file) %></a></li>
-				<% end %>
-			</ul>
-			<br><br><br>
-			<ul><a href='overview.html' target='content'>Home</a></ul>
-		</body>
-	</html>
+        <html>
+                <head>
+                        <title>nasldoc</title>
+                        <link rel = 'stylesheet' type= 'text/css' href='stylesheet.css'>
+                </head>
+                <body>
+                        <img src='nessus.jpg' />
+                        <br><br><br>
+                        <ul>
+                                <% @file_list.each_with_index do |file, i| %>
+                                        <% row_class = i % 2 == 0 ? "even" : "odd" %>
+                                        <% output_file = file.gsub(".", "_") %>
+                                        <% output_file = File.basename(file).gsub(".", "_") %>
+                                        <li class="<%= row_class %>"><a href='<%= output_file %>.html' target='content'><%= File.basename(file) %></a></li>
+                                <% end %>
+                        </ul>
+                        <br><br><br>
+                        <ul><a href='overview.html' target='content'>Home</a></ul>
+                </body>
+        </html>

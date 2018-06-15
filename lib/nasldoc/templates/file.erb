@@ -14,7 +14,6 @@
 	@comments.select(&filter1).select(&filter2).shift
   end
 %>
-
 <%
   def safe(obj, default, *attrs)
 	attrs.each do |attr|
@@ -344,7 +343,8 @@
 		<h3>Anonymous Parameters</h3>
 		<dl>
 		<% comm.anonparams.sort.each do |name, block| %>
-		  <dt><%= name %></dt>
+		  <dt><%= name %><% unless !comm.anonparams_type.has_key?(name) %><font color="#d14"> (<%= comm.anonparams_type[name] %>)</font>
+		  <% end %></dt>
 		  <dd><%= block %></dd>
 		<% end %>
 		</dl>
@@ -356,7 +356,9 @@
 		<dl>
 
 		<% @functions[name][:params].sort.each do |param| %>
-			<dt><%= param.name %></dt>
+			<dt><%= param.name %>
+			<% unless comm.nil? || !comm.params_type.has_key?(param.name) %><font color="#d14"> (<%= comm.params_type[param.name] %>)</font>
+			<% end %></dt>
 			<% unless comm.nil? || !comm.params.has_key?(param.name) %>
 			<dd><%= comm.params[param.name] %></dd>
 		  <% end %>
