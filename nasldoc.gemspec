@@ -52,6 +52,6 @@ Gem::Specification.new do |s|
 
 	s.add_development_dependency 'rake', '~>10.1'
 
-	s.add_runtime_dependency 'nasl', '~> 0.2', '>= 0.2.0'
+	s.add_runtime_dependency 'nasl', '~> 0.6', '>= 0.6.0'
 	s.add_runtime_dependency 'rainbow', '~> 2.0', '>= 2.0.0'
 end
