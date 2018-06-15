@@ -52,8 +52,8 @@ module NaslDoc
 			attr_accessor :description, :summary
 
 			# Tag attributes.
-			attr_accessor :anonparams, :categories, :deprecated, :includes, :nessus
-			attr_accessor :params, :remarks, :return
+			attr_accessor :anonparams, :anonparams_type, :categories, :deprecated, :includes, :nessus
+			attr_accessor :params, :params_type, :remarks, :return
 
 			# Export and function attributes.
 			attr_accessor :function
@@ -87,11 +87,13 @@ module NaslDoc
 
 				# Create tag attributes.
 				@anonparams = {}
+				@anonparams_type = {}
 				@categories = []
 				@deprecated = nil
 				@includes = []
 				@nessus = nil
 				@params = {}
+				@params_type = {}
 				@remarks = []
 				@return = nil
 
@@ -193,7 +195,7 @@ module NaslDoc
 			end
 
 			def parse_tags(text)
-				re_name = Regexp.new("[_a-zA-Z][_a-zA-Z0-9]*")
+				re_name = Regexp.new("(<|\\[)?[_a-zA-Z0-9:]*(\\]|>)?")
 				re_tags = Regexp.new(tags_regex)
 
 				# Tags start a line which continues until the next tag or blank line.
@@ -232,17 +234,29 @@ module NaslDoc
 						case tag
 							when '@anonparam', '@param'
 								# Parse the argument name.
-								name = block[re_name]
-								if name.nil?
+								parts_str = block[re_name]
+								if parts_str.nil?
 									raise TagFormatException, "Failed to parse the #{tag}'s name for #@name."
 								end
 
-								block = block[name.length..-1]
+								parts = parts_str.split(':')
+
+								name = parts[0]
+								name = name.gsub(/[\[\]<>]/, '')
+
+								block = block[parts_str.length..-1]
+
 								if block.nil?
 									raise TagFormatException, "Failed to parse the #{tag}'s block for #@name."
 								end
+
 								block.lstrip!
-								block = block.gsub(/^.*>/, "")
+
+								type = nil
+								if(parts.length > 1)
+									  type = parts[1]
+									  type = type.gsub(/[\[\]<>]/, '')
+								end
 
 								# Check for previous declarations of this name.
 								if @anonparams.key?(name)
@@ -252,10 +266,14 @@ module NaslDoc
 								if @params.key?(name) and not @params[name].nil?
 									raise DuplicateTagException, "The param '#{name}' was previously declared as a @param for #@name."
 								end
-
 								hash = self.send(attr + 's')
 								hash[name] = block
-
+								
+								if(!type.nil?)
+								  hash1 = self.send(attr + 's_type')
+								  hash1[name] = type
+								end
+								
 							when '@category'
 								unless @categories.empty?
 									raise DuplicateTagException, "The #{tag} tag appears more than once for #@name."

@@ -43,7 +43,7 @@ module NaslDoc
 				@error_count = 0
 				@options = Hash.new
 
-				@options[:output_directory] = "nasldoc_ouput/"
+				@options[:output_directory] = "nasldoc_output/"
 
 				@functions = Array.new
 				@globals = Array.new
