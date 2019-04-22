@@ -235,7 +235,7 @@ module NaslDoc
 							when '@anonparam', '@param'
 								# Parse the argument name.
 								parts_str = block[re_name]
-								if parts_str.nil?
+                                                                if parts_str.nil? || parts_str.empty?
 									raise TagFormatException, "Failed to parse the #{tag}'s name for #@name."
 								end
 
@@ -332,9 +332,9 @@ module NaslDoc
 				# Remember all the variables.
 				@variables = node.next.idents.map { |id|
 					if id.is_a? Nasl::Assignment
-						@lval.ident
+						id.lval.name
 					else
-						@name
+						id.name
 					end
 				}
 				# Name this comment for use in error messages.
