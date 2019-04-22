@@ -31,6 +31,27 @@
 		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
 		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
 		<link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
+		<script>
+		function filterIncludes() {
+		  // Declare variables
+		  var input, filter, ul, li, a, i, txtValue;
+		  input = document.getElementById('myInput');
+		  filter = input.value.toUpperCase();
+		  ul = document.getElementById("navList");
+		  li = ul.getElementsByTagName('li');
+
+		  // Loop through all list items, and hide those who don't match the search query
+		  for (i = 0; i < li.length; i++) {
+		    a = li[i].getElementsByTagName("a")[0];
+		    txtValue = a.textContent || a.innerText;
+		    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+		      li[i].style.display = "";
+		    } else {
+		      li[i].style.display = "none";
+		    }
+		  }
+		}
+		</script>
 	</head>
 
 	<body>
@@ -57,14 +78,24 @@
 			<div class="row-fluid">
 				<div class="span3">
 					<div class="well sidebar-nav">
-						<ul class="nav nav-list">
+						<input type="text" id="myInput" onkeyup="filterIncludes()" placeholder="Search include names..">
+						<ul id="navList" class="nav nav-list">
 							<% @file_list.each_with_index do |file, i| %>
 								<% row = i.even? ? 'even' : 'odd' %>
 								<% link = url(file) %>
 								<li class="<%= row %>">
 									<a href="<%= link %>"><%= link.gsub('.html', '.inc') %></a>
 								</li>
-							<% end %>
+							<% i = 0 %>
+							<% Dir.entries(@options[:output_directory]).sort.each do |file|	%>
+								<% next if file == 'index.html' or !file.end_with? ".html" %>
+								<% row = i.even? ? 'even' : 'odd' %>
+								<li class="<%= row %>">
+									<a href="<%= file %>"><%= file.gsub('.html', '.inc') %></a>
+								</li>
+								<% i = i + 1 %>
+							<% end %>							<% end %>
+
 						</ul>
 					</div><!--/.well -->
 				</div><!--/span-->

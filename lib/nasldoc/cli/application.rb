@@ -108,6 +108,20 @@ module NaslDoc
 				end
 			end
 
+			def _build_fn_name(fn)
+				fn_str = ''
+				ns = @fn_ns_map[fn.to_s]
+				obj = @obj_fn_map[fn.to_s]
+				if (!ns.nil?)
+					fn_str += ns + "::"
+				end
+				if (!obj.nil?)
+					fn_str += obj + "."
+				end
+				fn_str += fn.name.name
+				fn_str
+			end
+
 			# Compiles a template for each file
 			def build_template name, path=nil
 				path ||= name
@@ -148,9 +162,29 @@ module NaslDoc
 						show_ns = 1
 					end
 					code_snip = fn.context(nil, false, false)
+
 					if (!code_snip.nil?)
-						code_snip = code_snip.gsub(/#*$/, "").rstrip
+						tmp_code_snip = ""
+						start_block = false
+						block_level = 0
+
+						for pos in 0...code_snip.length
+							tmp_c = code_snip[pos].chr
+							tmp_code_snip += tmp_c
+							if(tmp_c == "{")
+								start_block = true
+								block_level += 1
+							elsif(tmp_c == "}")
+								block_level -= 1
+							end
+							if(start_block and block_level == 0)
+								break
+							end
+						end
+
+						code_snip = tmp_code_snip
 					end
+
 					@functions[fn.to_s] = {
 						:name => fn.name.name,
 						:code => code_snip,
@@ -158,7 +192,8 @@ module NaslDoc
 						:namespace => ns,
 						:fn_type => fn.fn_type,
 						:show_ns => show_ns,
-						:object => @obj_fn_map[fn.to_s]
+						:object => @obj_fn_map[fn.to_s],
+						:name_str => _build_fn_name(fn)
 					}
 					@function_count += 1
 				end
@@ -271,7 +306,9 @@ module NaslDoc
 					"ovaldi32",
 					"ovaldi64",
 					"os_cves.inc",
-                                        "kernel_cves.inc"
+                                        "kernel_cves.inc",
+					"tenable_mw_scan32.inc",
+					"tenable_mw_scan64.inc"
 				]
 
 				new_file_list = file_list.dup

@@ -330,8 +330,13 @@ module NaslDoc
 
 			def extract_global(node)
 				# Remember all the variables.
-				@variables = node.next.idents.map &:name
-
+				@variables = node.next.idents.map { |id|
+					if id.is_a? Nasl::Assignment
+						@lval.ident
+					else
+						@name
+					end
+				}
 				# Name this comment for use in error messages.
 				@name = "global variable(s) #{@variables.join(', ')}"
 			end
