@@ -52,6 +52,7 @@ module NaslDoc
 				@overview = nil
 
 				@fn_ns_map = {}
+				@global_map = {}
 				@obj_ns_map = {}
 				@obj_fn_map = {}
 
@@ -84,18 +85,16 @@ module NaslDoc
 			end
 
 			# Generates namespace mappings
-			def build_namespace_map(tree, namespaces, fn_map, obj_map, obj_fn_map, level=0, prefix = nil, object = nil)
+			def build_namespace_map(tree, namespaces, global_map, fn_map, obj_map, obj_fn_map, level=0, prefix = nil, object = nil)
 				cur_namespace = prefix
 				for node in tree do
 					if(node.class.to_s == "Nasl::Namespace")
-						if(level == 0)
-							namespaces << node.name.name
-							build_namespace_map(node, namespaces, fn_map, obj_map, obj_fn_map, level + 1, node.name.name)
-						else
+						ns = node.name.name
+						if(level != 0)
 							ns = prefix + '::' + node.name.name
-							namespaces << ns
-							build_namespace_map(node, namespaces, fn_map, obj_map, obj_fn_map, level + 1, ns)
 						end
+						namespaces << ns
+						build_namespace_map(node, namespaces, global_map, fn_map, obj_map, obj_fn_map, level + 1, ns)
 					elsif(node.class.to_s == "Nasl::Function")
 						fn_map[node.to_s] = cur_namespace
 						if(!object.nil?)
@@ -103,7 +102,9 @@ module NaslDoc
 						end
 					elsif(node.class.to_s == "Nasl::Object")
 						obj_map[node.to_s] = cur_namespace
-						build_namespace_map(node, namespaces, fn_map, obj_map, obj_fn_map, level + 1, cur_namespace, node.name.name)
+						build_namespace_map(node, namespaces, global_map, fn_map, obj_map, obj_fn_map, level + 1, cur_namespace, node.name.name)
+					elsif(node.class.to_s == "Nasl::Global")
+						global_map[node.idents[0].to_s] = cur_namespace
 					end
 				end
 			end
@@ -151,7 +152,7 @@ module NaslDoc
 				end
 
 				# get namespace mapping
-				build_namespace_map(tree, @namespaces, @fn_ns_map, @obj_ns_map, @obj_fn_map)
+				build_namespace_map(tree, @namespaces, @global_map, @fn_ns_map, @obj_ns_map, @obj_fn_map)
 				
 				# Collect the functions.
 				@functions = Hash.new()
@@ -224,10 +225,17 @@ module NaslDoc
 				# Collect the globals.
 				@globals = tree.all(:Global).map(&:idents).flatten.map do |id|
 					if id.is_a? Nasl::Assignment
-						id.lval.name
+						tmp_id = id.lval.name
 					else
-						id.name
+						tmp_id = id.name
 					end
+					node_str = id.to_s
+					ns = @global_map[node_str]
+					id = tmp_id
+					if (!ns.nil?)
+						id = ns + "::" + id
+					end
+					id += "|" + node_str
 				end.sort
 
 				@globs_prv = @globals.select { |n| n =~ /^_/ }

@@ -86,6 +86,7 @@
 								<li class="<%= row %>">
 									<a href="<%= link %>"><%= link.gsub('.html', '.inc') %></a>
 								</li>
+							<% end %>
 							<% i = 0 %>
 							<% Dir.entries(@options[:output_directory]).sort.each do |file|	%>
 								<% next if file == 'index.html' or !file.end_with? ".html" %>
@@ -94,8 +95,7 @@
 									<a href="<%= file %>"><%= file.gsub('.html', '.inc') %></a>
 								</li>
 								<% i = i + 1 %>
-							<% end %>							<% end %>
-
+							<% end %>
 						</ul>
 					</div><!--/.well -->
 				</div><!--/span-->

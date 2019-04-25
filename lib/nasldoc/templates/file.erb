@@ -47,6 +47,21 @@
 %>
 
 <%
+
+def colorize_variable_names(name)
+	var_str = ''
+	var_parts = name.split('::')
+	if(var_parts.length == 1)
+		return name
+	end
+
+	for i in 0..var_parts.length-2 do
+		var_str += "<font color='#770877'>" + var_parts[i] + "</font><b>::</b>"
+	end
+	var_str += var_parts[var_parts.length-1]
+	var_str	
+end
+
 def build_fn_name(name, colorize = 0)
 	fn_str = ''
 	if (!@functions[name][:namespace].nil?)
@@ -160,15 +175,24 @@ end
 	  <div class="well sidebar-nav">
 	  <input type="text" id="myInput" onkeyup="filterIncludes()" placeholder="Search include names..">
 	  <ul id="navList" class="nav nav-list">
+		<% tmp_file_list = Array.new %>
 		<% @file_list.each_with_index do |file, i| %>
+			<% if tmp_file_list.include?(file) %>
+			<% 	next %>
+			<% end %>
+			<% tmp_file_list << file %>
 			<% row = i.even? ? 'even' : 'odd' %>
 			<% link = url(file) %>
 			<li class="<%= row %>">
-			  <a href="<%= link %>"><%= link.gsub('.html', '.inc') %></a>
+				<a href="<%= link %>"><%= link.gsub('.html', '.inc') %></a>
 			</li>
 		<% end %>
 		<% i = 0 %>
 		<% Dir.entries(@options[:output_directory]).sort.each do |file|	%>
+			<% if tmp_file_list.include?(file) %>
+			<% 	next %>
+			<% end %>
+			<% tmp_file_list << file %>
 			<% next if file == 'index.html' or !file.end_with? ".html" %>
 			<% row = i.even? ? 'even' : 'odd' %>
 			<li class="<%= row %>">
@@ -242,8 +266,8 @@ end
 		  </tr>
                   <% list.each do |name| %>
 		  <tr>
-			<td><a href="#<% name %>"><%= name %></a></td>
-			<td><%= safe(comment(name, :global), "", :summary) %></td>
+			<td><a href="#<%= name.split('|')[0] %>"><%= colorize_variable_names(name.split('|')[0]) %></a></td>
+			<td><%= safe(comment(name.split('|')[1], :global), "", :summary) %></td>
 		  </tr>
 		  <% end %>
 		</table>
@@ -285,8 +309,8 @@ end
 		<% unless list.empty? %>
 		<h1><%= name %> Variable Details</h1>
 		<% list.each do |name| %>
-		<h2 id="<%= name %>"><%= name %></h2>
-		<% comm = comment(name, :global) %>
+		<h2 id="<%= name.split('|')[0] %>"><%= colorize_variable_names(name.split('|')[0]) %></h2>
+		<% comm = comment(name.split('|')[1], :global) %>
 
 		<% unless comm.nil? %>
 		<% unless comm.summary.nil? %>
